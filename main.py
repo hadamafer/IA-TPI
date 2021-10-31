@@ -22,6 +22,7 @@ root.geometry("600x500") #ancho por alto
 root.pack_propagate(False) #para que  no se cambie el tamaño 
 root.title("C4.5 NAKS")
 root.resizable(width=False , height=False)
+root.iconbitmap('pine-tree.ico')
 
 global a , b , c, col_gan, total_rows, total_columns, t, lst, col_tasa #probar si se puede eliminar
 
@@ -229,6 +230,8 @@ window.state('withdraw') #hace que arranque fullscreen
 window.resizable(width=True , height=True) # si se comenta la sentancia anterior anda y lo que ahce es adaprtarse al tamaño de la imagen 
 #window.pack_propagate(False) #para que  no se cambie el tamaño
 window.title("C4.5 NAKS")
+window.iconbitmap('pine-tree.ico')
+
 
 tab_control = ttk.Notebook(window)
 
