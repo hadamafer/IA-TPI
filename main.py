@@ -100,9 +100,6 @@ def File_dialog(): #solicita el archivo y lo carga
     
     
 def Load_excel_data(): #ejecuta el algortmo 
-    
-    lienzo.delete("all") #agregue
-    lienzo2.delete("all") #agregue
     file_path=label_file["text"]
     try:
         csv_filename=r"{}".format(file_path)
@@ -110,6 +107,7 @@ def Load_excel_data(): #ejecuta el algortmo
     except FileNotFoundError:
         tk.messagebox.showerror("Error","No hay archivo seleccionado")
         return None
+    
     Graficar(df)
     root.state(newstate = "withdraw")
     window.state(newstate = "zoomed")
@@ -152,7 +150,7 @@ def arbolGanancia(df):
     A = nx.nx_agraph.to_agraph(TG) # to_agraph --> Returns a pygraphviz graph from a NetworkX graph N.
     A.layout()
     A.draw('TG')
-    nx.drawing.nx_pydot.write_dot(TG, 'arbol') #genera el script , creo q no lo necesitamos 
+    nx.drawing.nx_pydot.write_dot(TG, 'TG') #genera el script , creo q no lo necesitamos 
     gv.render('dot', 'png', 'TG')
     
     #Imagen pestaña 1 || SE CARGA LA IMAGEN
@@ -160,13 +158,16 @@ def arbolGanancia(df):
     ancho = img.size[0] #guarda el ancho de la imagen ingresada
     largo = img.size[1] # guarda el largo de la imagen ingresada 
     img=img.resize((ancho,largo),Image.ANTIALIAS) # modifica el tamaño de la imagen
+
     lienzo.config(scrollregion=(0, 0, ancho, largo))
+
     img= ImageTk.PhotoImage(img)
+
     lienzo.create_image(0, 0, anchor="nw", image=img)
+
     d,e,f=cuadroComp(TG)
     
     col_gan=[['GANANCIA'],[d],[e],[f],[len(listaNodosDec)]]
-
     return col_gan
 
 def arbolTasa(df):
@@ -184,7 +185,7 @@ def arbolTasa(df):
     A = nx.nx_agraph.to_agraph(TT) # to_agraph --> Returns a pygraphviz graph from a NetworkX graph N.
     A.layout()
     A.draw('TT')
-    nx.drawing.nx_pydot.write_dot(TT, 'arbol') #genera el script , creo q no lo necesitamos 
+    nx.drawing.nx_pydot.write_dot(TT, 'TT') #genera el script , creo q no lo necesitamos 
     gv.render('dot', 'png', 'TT')
     
     #Imagen pestaña 2 || SE CARGA LA IMAGEN
@@ -192,8 +193,11 @@ def arbolTasa(df):
     ancho = img.size[0] #guarda el ancho de la imagen ingresada
     largo = img.size[1] # guarda el largo de la imagen ingresada 
     img=img.resize((ancho,largo),Image.ANTIALIAS) # modifica el tamaño de la imagen
+
     lienzo2.config(scrollregion=(0, 0, ancho, largo))
+
     img= ImageTk.PhotoImage(img)
+
     lienzo2.create_image(0, 0, anchor="nw", image=img)
 
     a,b,c=cuadroComp(TT)
@@ -212,6 +216,8 @@ def clear_data():
 def volver_p1(): #funcion del boton volver de la pantalla 2
     window.state(newstate="withdraw")
     root.state(newstate="normal")
+    lienzo.delete("all") #agregue
+    lienzo2.delete("all") #agregue
     #lienzo.delete("all") #agregue
     
 
@@ -227,7 +233,7 @@ window.title("C4.5 NAKS")
 tab_control = ttk.Notebook(window)
 
 #PESTAÑA 1
-tab1 = tk.Frame(tab_control, bg='white')
+tab1 = tk.Frame(tab_control)
 tab_control.add(tab1, text='Ganancia')
 #PESTAÑA 2
 tab2 = tk.Frame(tab_control)
@@ -265,7 +271,6 @@ sbarV.pack(side=tk.RIGHT, fill=tk.Y )
 sbarH.pack(side=tk.BOTTOM, fill=tk.X)
 lienzo.config(yscrollcommand=sbarV.set)
 lienzo.config(xscrollcommand=sbarH.set)
-lienzo.config()
 lienzo.pack(side=tk.TOP, expand=True, fill=tk.BOTH) #opcion nueva fede (expand=True, fill="both", side="top")
 
 

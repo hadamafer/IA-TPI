@@ -87,6 +87,3 @@ def c4_5_ganancia(df, listaAtr,clase,listaNodosDec,thc, T, edge, cont, padrecont
                 edge = i
                 padrecont = x
                 c4_5_ganancia(reg,listaAtr,clase,listaNodosDec, thc,T, edge, cont,  padrecont, listaNodosPuros) #llamada recursiva
-   
-                
-
