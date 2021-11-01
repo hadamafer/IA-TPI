@@ -1,43 +1,54 @@
 import tkinter as tk
-from PIL import ImageTk
+from tkinter.messagebox import showerror, showinfo
+nombre = ""
+lenguaje = ""
 
-#Creamos un diccionario que nos permmita guardar las coordenadas y el nombre del objeto
-posicion = {"x": 0, "y": 0, "img": None}
 
-#Funcion que permite guardar en el diccionario anterior los datos de un objeto sobre el que presionamos con el raton
-def imgPress(event):
-    posicion["item"] = canvas.find_closest(event.x, event.y)[0]
-    posicion["x"] = event.x
-    posicion["y"] = event.y
+class Nueva(tk.Frame):
+    def _init_(self, master=None):
+        tk.Frame._init_(self, master)
+        self.pack()
+        self.mostrar_campos()
 
-#Funcion que permite reiniciar el diccionario cuando se sulta un objeto para poder usarlo de nuevo
-def imgRelease(event):
-    posicion["item"] = None
-    posicion["x"] = 0
-    posicion["y"] = 0
+    def mostrar_campos(self):
+        self.master.title("Nueva ventana")
+        self.nombre = tk.Label(self, text="Nombre y apellidos: ")
+        self.nombre.pack(side="left")
+        self.nombre = tk.Entry(self)
+        self.nombre.pack(side="left")
 
-#Funcion que calcula el desplazamiento y usa el metodo move() de Canvas para reposicionar el item.
-def imgMotion(event):
-    incremento_x = event.x - posicion["x"]
-    incremento_y = event.y - posicion["y"]
-    canvas.move(posicion["item"], incremento_x, incremento_y)
-    posicion["x"] = event.x
-    posicion["y"] = event.y
+        self.lenguaje = tk.Label(self, text="Lenguaje de programación preferido: ")
+        self.lenguaje.pack(side="left")
+        self.lenguaje = tk.Entry(self)
+        self.lenguaje.pack(side="left")
 
-#Creamos nuestra ventana y el canvas.
-root = tk.Tk()
-canvas = tk.Canvas(width=400, height=400)
-canvas.pack(fill="both", expand=True)
+        self.button_guardar = tk.Button(self, text="Guardar", fg="green", command=self.actualizar_datos)
+        self.button_guardar.pack(side="left")
 
-#Enlazamos las senales con su correspondiente funcion usando una etiqueta que delimita los objetos sobre los que se aplica
-canvas.tag_bind("img", "<ButtonPress-1>", imgPress)
-canvas.tag_bind("img", "<ButtonRelease-1>", imgRelease)
-canvas.tag_bind("img", "<B1-Motion>", imgMotion)
+        self.button_cancelar = tk.Button(self, text="Cancelar", fg="red", command=self.master.destroy)
+        self.button_cancelar.pack(side="left")
 
-#Cargamos la imagen, estipulando la etiqueta que decidimos antes
-pic = "TT.png"
-img = ImageTk.PhotoImage(file=pic)
-canvas.create_image(200, 200, anchor=tk.CENTER, image=img, tags="img")
+    def actualizar_datos(self):
+        nombre = self.nombre.get()
+        lenguaje_text = self.lenguaje.get()
+        nombre_lenguaje_requerido = (nombre.isspace() or nombre == '') and (lenguaje_text.isspace()
+                                                                            or lenguaje_text == '')
 
-#Lanzamos nuestra app
-root.mainloop()
+        nombre_requerido = (nombre.isspace() and not lenguaje_text.isspace()) or (nombre == '' and lenguaje_text != '')
+
+        lenguaje_requerido = (not nombre.isspace() and lenguaje_text.isspace()) or (nombre != ''
+                                                                                    and lenguaje_text == '')
+
+        mensaje = "Debe ingresar su nombre y lenguaje de programación preferido" if nombre_lenguaje_requerido else "Debe ingresar su nombre" if nombre_requerido else "Debe ingresar su lenguaje de programación preferido" if lenguaje_requerido else None
+        if mensaje:
+            showerror("Campos requeridos", mensaje, parent=self)
+        else:
+            print("Nombre y apellidos:", nombre)
+            print("Lenguaje de programación preferido:", lenguaje_text)
+            showinfo("Acción exitosa", "Los datos se han guardado correctamente", parent=self)
+            self.master.destroy()
+
+
+class Principal(tk.Frame):
+    def _init_(self, master=None):
+        tk.Frame.__in

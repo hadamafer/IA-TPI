@@ -41,10 +41,10 @@ file_frame = tk.LabelFrame(root,text="Seleccione un archivo para trabajar")
 file_frame.place(height=100,width=400,rely=0.75,relx=0.01)
 
 #botones
-button1= tk.Button(file_frame,text="Armar Arbol", command=lambda: Load_excel_data() )  #   TO DO : COMMAND
+button1= tk.Button(file_frame,text="Armar Arbol", command=lambda: Ejecutar() )  #   TO DO : COMMAND
 button1.place(rely=0.65,relx=0.65)
 #lambdas permite reiniciar la funcion cada vez
-button2 = tk.Button(file_frame,text="Buscar",command=lambda: File_dialog() ) # falta hacer el comando 
+button2 = tk.Button(file_frame,text="Buscar",command=lambda: Busqueda() ) # falta hacer el comando 
 button2.place(rely=0.65,relx=0.3)
 
 
@@ -71,7 +71,7 @@ class ValorVacio(Error):
     pass
 
 #funciones PANTALLA 1
-def File_dialog(): #solicita el archivo y lo carga
+def Busqueda(): #solicita el archivo y lo carga
     filename=filedialog.askopenfilename(initialdir="/",title="Seleccionar archivo",filetype=(("CSV files","*.csv"),("All Files","*.*")))
     label_file["text"]=filename
     file_path=label_file["text"]
@@ -102,7 +102,7 @@ def File_dialog(): #solicita el archivo y lo carga
     return None
     
     
-def Load_excel_data(): #ejecuta el algortmo
+def Ejecutar(): #ejecuta el algortmo
     global col_gan, total_rows, total_columns, t, lst, col_tasa 
     file_path=label_file["text"]
     try:
@@ -239,10 +239,12 @@ window.resizable(width=True , height=True) # si se comenta la sentancia anterior
 window.title("C4.5 NAKS")
 window.iconbitmap('pine-tree.ico')
 
+
 #Creamos un diccionario que nos permmita guardar las coordenadas y el nombre del objeto
 posicion = {"x": 0, "y": 0, "img": None}
 
 tab_control = ttk.Notebook(window)
+
 
 #PESTAÑA 1
 tab1 = tk.Frame(tab_control)
@@ -259,12 +261,12 @@ tab_control.pack(expand=1, fill='both')
 
 s = ttk.Style()
 s.theme_create( "MyStyle", parent="alt", settings={
-        "TNotebook": {"configure": {"tabmargins": [0, 10, 2, 0] } },
-        "TNotebook.Tab": {"configure": {"padding": [254, 10],"background": "#fdd57e",
+        "TNotebook": {"configure": {"tabmargins": [0, 10, 2, 0]} },
+        "TNotebook.Tab": {"configure": {"padding": [150, 10],"background": "#eadca6",
                                         "font" : ('IBM Plex Sans','14','bold') },
-                              "map": {"background": [("selected", "#C70039"), 
-                                                      ("active", "#fc9292")],
-                                       "foreground": [("selected", "#ffffff"),
+                              "map": {"background": [("selected", "#c36a3d"), 
+                                                      ("active", "#e2c275")],
+                                       "foreground": [("selected", "#000000"),
                                                       ("active", "#000000")]}}})
 
 
@@ -373,6 +375,13 @@ class Table:
                 self.e.grid(row=i, column=j,ipady=40,sticky="n")
                 self.e.insert(END, lst[i][j]) #inserta texto VER COMO PONER LO DE MAJO
                 self.e.configure(state='readonly', borderwidth=5, relief=GROOVE, bg="white") #hace que no sea editable 
+
+def on_closing():
+    if messagebox.askokcancel("CERRAR", "¿Seguro que quiere salir?"):
+        root.destroy()
+ 
+window.protocol("WM_DELETE_WINDOW", on_closing)
+root.protocol("WM_DELETE_WINDOW", on_closing)
 
 
 root.mainloop()
