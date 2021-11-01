@@ -4,8 +4,8 @@ import numpy as np
 from pandas.core.frame import DataFrame
 import funciones as pr
 import networkx as nx
-#import matplotlib.pyplot as plt
-#from matplotlib.pyplot import figure
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import figure
 import graphviz as gv
 from networkx.drawing.nx_agraph import graphviz_layout
 from networkx.classes.digraph import DiGraph
