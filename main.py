@@ -121,19 +121,17 @@ def Graficar(df):
     listaAtr = listaAtr[:-1]
     #listaAtr = ip.control_id(arch, listaAtr)
     listaNodosDec = []
-    TG= nx.DiGraph()
+    T= nx.DiGraph()
     #Aca arriba estaba png
     # # cambiar esto --> pos = nx.spring_layout(G)
     listaNodosPuros=[]
-    ig.c4_5_ganancia(df,listaAtr,cla,listaNodosDec, 0,TG,0,0,0,listaNodosPuros) 
-    pos = nx.nx_pydot.graphviz_layout(TG) #graphviz genera la posicion de los nodos
-    nx.draw_networkx(to_agraph, pos) #dibujar el grafo 
-    #plt.show() 
-    A = nx.nx_agraph.to_agraph(TG)
-    # to_agraph --> Returns a pygraphviz graph from a NetworkX graph N.
+    ig.c4_5_ganancia(df,listaAtr,cla,listaNodosDec, 0,T,0,0,0,listaNodosPuros) 
+    pos = nx.nx_pydot.graphviz_layout(T) #graphviz genera la posicion de los nodos
+    nx.draw_networkx(T, pos) #dibujar el grafo 
+    A = nx.nx_agraph.to_agraph(T) # to_agraph --> Returns a pygraphviz graph from a NetworkX graph N.
     A.layout()
     A.draw('TG')
-    nx.drawing.nx_pydot.write_dot(TG, 'arbol') #genera el script , creo q no lo necesitamos 
+    nx.drawing.nx_pydot.write_dot(T, 'TG') #genera el script , creo q no lo necesitamos 
     gv.render('dot', 'png', 'TG')
     
     #Imagen pestaña 1 || SE CARGA LA IMAGEN
@@ -141,15 +139,12 @@ def Graficar(df):
     ancho = img.size[0] #guarda el ancho de la imagen ingresada
     largo = img.size[1] # guarda el largo de la imagen ingresada 
     img=img.resize((ancho,largo),Image.ANTIALIAS) # modifica el tamaño de la imagen
-    
+
     lienzo.config(scrollregion=(0, 0, ancho, largo))
-    
+
     img= ImageTk.PhotoImage(img)
-    
-    lienzo.create_image(0, 0, anchor="nw", image=img)
-    
-    tab_control.pack(expand=1, fill='both')
-    #Scrollbar Imagen 1
+
+    lienzo.create_image(0, 0, anchor="nw", image=img, tag="img")
    
     return None
 
@@ -174,6 +169,8 @@ window.resizable(width=True , height=True) # si se comenta la sentancia anterior
 #window.pack_propagate(False) #para que  no se cambie el tamaño
 window.title("C4.5 NAKS")
 
+#Creamos un diccionario que nos permmita guardar las coordenadas y el nombre del objeto
+posicion = {"x": 0, "y": 0, "img": None}
 tab_control = ttk.Notebook(window)
 
 #PESTAÑA 1
@@ -185,26 +182,65 @@ tab_control.add(tab2, text='Tasa de Ganancia')
 #PESTAÑA 3
 tab3 = ttk.Frame(tab_control)
 tab_control.add(tab3, text='Comparacion')
+tab_control.pack(expand=1, fill='both') 
 
-#ver donde poner || SE CREA EL LIENZO
-lienzo = Canvas(tab1, relief=SUNKEN)
+s = ttk.Style()
+s.theme_create( "MyStyle", parent="alt", settings={
+        "TNotebook": {"configure": {"tabmargins": [0, 10, 2, 0] } },
+        "TNotebook.Tab": {"configure": {"padding": [254, 10],"background": "#fdd57e",
+                                        "font" : ('IBM Plex Sans','14','bold') },
+                              "map": {"background": [("selected", "#C70039"), 
+                                                      ("active", "#fc9292")],
+                                       "foreground": [("selected", "#ffffff"),
+                                                      ("active", "#000000")]}}})
 
+
+
+                                        
+#Lienzo tab1
+lienzo = Canvas(tab1, bg='white', highlightthickness=0, relief='ridge')
 sbarV = tk.Scrollbar(tab1, orient=tk.VERTICAL, command=lienzo.yview)
 sbarH = tk.Scrollbar(tab1, orient=tk.HORIZONTAL, command=lienzo.xview)
-sbarV.pack(side=tk.RIGHT, fill=tk.Y)
+sbarV.pack(side=tk.RIGHT, fill=tk.Y )
 sbarH.pack(side=tk.BOTTOM, fill=tk.X)
-    
 lienzo.config(yscrollcommand=sbarV.set)
 lienzo.config(xscrollcommand=sbarH.set)
-lienzo.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
+lienzo.pack(side=tk.TOP, expand=True, fill=tk.BOTH) #opcion nueva fede (expand=True, fill="both", side="top")
+
+#Funcion que permite guardar en el diccionario anterior los datos de un objeto sobre el que presionamos con el raton
+def imgPress(event):
+    posicion["item"] = lienzo.find_closest(event.x, event.y)[0]
+    posicion["x"] = event.x
+    posicion["y"] = event.y
+
+#Funcion que permite reiniciar el diccionario cuando se sulta un objeto para poder usarlo de nuevo
+def imgRelease(event):
+    posicion["item"] = None
+    posicion["x"] = 0
+    posicion["y"] = 0
+
+#Funcion que calcula el desplazamiento y usa el metodo move() de Canvas para reposicionar el item.
+def imgMotion(event):
+    incremento_x = event.x - posicion["x"]
+    incremento_y = event.y - posicion["y"]
+    lienzo.move(posicion["item"], incremento_x, incremento_y)
+    posicion["x"] = event.x
+    posicion["y"] = event.y
+    
+#Enlazamos las senales con su correspondiente funcion usando una etiqueta que delimita los objetos sobre los que se aplica
+lienzo.tag_bind("img", "<ButtonPress-1>", imgPress)
+lienzo.tag_bind("img", "<ButtonRelease-1>", imgRelease)
+lienzo.tag_bind("img", "<B1-Motion>",imgMotion)
+
+#TERMINA LIENZO TAB1
 
 
 #etiqueta del boton volver
 volver = tk.LabelFrame(window)
-volver.pack(fill="x", expand= 1, side = "bottom") #hace que sea persistente la label del boton
-volver.config(width=500, height= 70)
+volver.place(relx=50, rely=50, height= 50)
+volver.pack(pady=30)
 buttonE= tk.Button(volver, text="Volver", width=10,height=2, command=lambda:volver_p1())
-buttonE.place(rely=0.25,relx=0.90)
+buttonE.pack()
 
 
 #etiqueta donde esta la tabla 
@@ -226,6 +262,7 @@ class Table:
                 self.e.configure(state='readonly') #hace que no sea editable 
              
 
+
 # Tomamos la data
 lst = [('','GANANCIA', "TASA DE GANANCIA"),
        ("Nodos hojas","",""),
@@ -234,10 +271,6 @@ lst = [('','GANANCIA', "TASA DE GANANCIA"),
        ("Amplitud","",''),
        ("Profundidad","",'')]
    
-# Encontrar el total de filas y columnas de la lista para la tabla
-total_rows = len(lst)
-total_columns = len(lst[0])
 
-t = Table(tab3)
 
 root.mainloop()
