@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 import pydot
 
+from probando import Zoom_Advanced
+
 #---------------PANTALLA 1 ---------------------------------
 root=tk.Tk()
 root.geometry("600x500") #ancho por alto
@@ -114,8 +116,9 @@ def Ejecutar(): #ejecuta el algortmo
     
     col_gan=[]
     col_tasa=[]
+
     arbol(df)
-    #arbolTasa(df)
+
     # Tomamos la datac
     lst = [('',col_gan[0], 'TASA DE GANANCIA'),
     ("Cantidad de caminos",col_gan[1],col_tasa[1]),
@@ -157,7 +160,9 @@ def arbol(df):
     nx.drawing.nx_pydot.write_dot(TG, 'TG') #genera el script , creo q no lo necesitamos 
     gv.render('dot', 'png', 'TG')
     
+    
     #Imagen pestaña 1 || SE CARGA LA IMAGEN
+
     img= Image.open("TG.png") #lee la imagen
     ancho = img.size[0] #guarda el ancho de la imagen ingresada
     largo = img.size[1] # guarda el largo de la imagen ingresada 
@@ -176,14 +181,14 @@ def arbol(df):
     global a, b, c, col_tasa
     
     col_tasa=[]
-    listaAtr = df.columns
-    cla = listaAtr[-1]
-    listaAtr = listaAtr[:-1]
-    listaAtr= control_id(df,listaAtr)
-    listaNodosDec = []
+    listaAtr2 = df.columns
+    cla2 = listaAtr2[-1]
+    listaAtr2 = listaAtr2[:-1]
+    listaAtr2= control_id(df,listaAtr2)
+    listaNodosDec2 = []
     TT= nx.DiGraph()
-    listaNodosPuros=[]
-    it.c4_5(df,listaAtr,cla,listaNodosDec, 0.1,TT,0,0,0,listaNodosPuros) 
+    listaNodosPuros2=[]
+    it.c4_5(df,listaAtr2,cla2,listaNodosDec2, 0.1,TT,0,0,0,listaNodosPuros2) 
     pos2 = nx.nx_pydot.graphviz_layout(TT) #graphviz genera la posicion de los nodos
     nx.draw_networkx(TT, pos2) #dibujar el grafo 
     A2 = nx.nx_agraph.to_agraph(TT) # to_agraph --> Returns a pygraphviz graph from a NetworkX graph N.
@@ -247,7 +252,7 @@ tab_control = ttk.Notebook(window)
 
 
 #PESTAÑA 1
-tab1 = tk.Frame(tab_control)
+tab1 = ttk.Frame(tab_control)
 tab_control.add(tab1, text='Ganancia')
 #PESTAÑA 2
 tab2 = tk.Frame(tab_control)
@@ -286,17 +291,17 @@ lienzo.config(xscrollcommand=sbarH.set)
 
 lienzo.pack(side=tk.TOP, expand=True, fill=tk.BOTH) #opcion nueva fede (expand=True, fill="both", side="top")
 
-#Funcion que permite guardar en el diccionario anterior los datos de un objeto sobre el que presionamos con el raton
+# #Funcion que permite guardar en el diccionario anterior los datos de un objeto sobre el que presionamos con el raton
 def imgPress(event):
     posicion["item"] = lienzo.find_closest(event.x, event.y)[0]
     posicion["x"] = event.x
     posicion["y"] = event.y
 
-#Funcion que permite reiniciar el diccionario cuando se sulta un objeto para poder usarlo de nuevo
+# #Funcion que permite reiniciar el diccionario cuando se sulta un objeto para poder usarlo de nuevo
 def imgRelease(event):
-    posicion["item"] = None
-    posicion["x"] = 0
-    posicion["y"] = 0
+     posicion["item"] = None
+     posicion["x"] = 0
+     posicion["y"] = 0
 
 #Funcion que calcula el desplazamiento y usa el metodo move() de Canvas para reposicionar el item.
 def imgMotion(event):
@@ -306,7 +311,7 @@ def imgMotion(event):
     posicion["x"] = event.x
     posicion["y"] = event.y
     
-#Enlazamos las senales con su correspondiente funcion usando una etiqueta que delimita los objetos sobre los que se aplica
+# #Enlazamos las senales con su correspondiente funcion usando una etiqueta que delimita los objetos sobre los que se aplica
 lienzo.tag_bind("img", "<ButtonPress-1>", imgPress)
 lienzo.tag_bind("img", "<ButtonRelease-1>", imgRelease)
 lienzo.tag_bind("img", "<B1-Motion>",imgMotion)
