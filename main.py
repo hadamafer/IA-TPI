@@ -3,7 +3,8 @@ import tkinter as tk
 from tkinter import  filedialog,messagebox, ttk
 from tkinter import font 
 from tkinter.font import BOLD
-import pandas as pd 
+import pandas as pd
+from pandas.core import frame 
 import implementacion_ganancia as ig
 import implementacion_tasa as it
 from funciones import cuadroComp, control_id
@@ -20,7 +21,7 @@ from probando import Zoom_Advanced
 
 #---------------PANTALLA 1 ---------------------------------
 root=tk.Tk()
-root.geometry("600x500") #ancho por alto
+root.geometry("900x500") #ancho por alto
 root.pack_propagate(False) #para que  no se cambie el tamaño 
 root.title("C4.5 NAKS")
 root.resizable(width=False , height=False)
@@ -28,19 +29,36 @@ root.iconbitmap('pine-tree.ico')
 
 global a , b , c, col_gan, total_rows, total_columns, t, lst, col_tasa #probar si se puede eliminar
 
+#TEMA
+s = ttk.Style()
+s.theme_create( "MyStyle", parent="alt", settings={
+        "TNotebook": {"configure": {"tabmargins": [0, 10, 2, 0]} },
+        "TNotebook.Tab": {"configure": {"padding": [150, 10],"background": "#eadca6",
+                                        "font" : ('IBM Plex Sans','14','bold') },
+                              "map": {"background": [("selected", "#c36a3d"), 
+                                                      ("active", "#e2c275")],
+                                       "foreground": [("selected", "#000000"),
+                                                      ("active", "#000000")]}},
+        "Treeview":{"configure":{"font" : ('IBM Plex Sans','12') }},
+        "Treeview.Heading":{"configure": {"background": "white",
+                                        "font" : ('IBM Plex Sans','12','') }}})
+
+s.theme_use("MyStyle")
+
 # ----------------------------------------------------------------------------------
 # mainframe = tk.Frame(root)
 # mainframe.pack()
 
 #frame para ver el excel 
 frame1 =tk.LabelFrame(root, text="")
-frame1.place(height=350, width=600)
+frame1.place(height=350, width=900)
 # button3 = tk.Button(mainframe, text="Graficar Arbol", command=lambda: Graficar()) # falta hacer el comando 
 # button3.pack(side=LEFT)
 
 #parte de los botones 
-file_frame = tk.LabelFrame(root,text="Seleccione un archivo para trabajar")
+file_frame = tk.LabelFrame(root,text="Seleccione un archivo para trabajar" )
 file_frame.place(height=100,width=400,rely=0.75,relx=0.01)
+
 
 #botones
 button1= tk.Button(file_frame,text="Armar Arbol", command=lambda: Ejecutar() )  #   TO DO : COMMAND
@@ -64,6 +82,9 @@ treescrollx=tk.Scrollbar(frame1,orient="horizontal",command=tv1.xview) #barra ho
 tv1.configure(xscrollcommand=treescrollx.set,yscrollcommand=treescrolly.set) #agrega las barras en la label
 treescrollx.pack(side="bottom", fill="x") #posiciones relativas de los scrolls
 treescrolly.pack(side="right",fill="y")
+
+
+
 
 class Error(Exception):
     """Base class for other exceptions"""
@@ -264,18 +285,7 @@ tab_control.add(tab3, text='Comparacion')
 tab_control.pack(expand=1, fill='both') 
 
 
-s = ttk.Style()
-s.theme_create( "MyStyle", parent="alt", settings={
-        "TNotebook": {"configure": {"tabmargins": [0, 10, 2, 0]} },
-        "TNotebook.Tab": {"configure": {"padding": [150, 10],"background": "#eadca6",
-                                        "font" : ('IBM Plex Sans','14','bold') },
-                              "map": {"background": [("selected", "#c36a3d"), 
-                                                      ("active", "#e2c275")],
-                                       "foreground": [("selected", "#000000"),
-                                                      ("active", "#000000")]}}})
 
-
-s.theme_use("MyStyle")
                                         
 #Lienzo tab1
 lienzo = Canvas(tab1, bg='white', highlightthickness=0, relief='ridge')
