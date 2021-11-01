@@ -41,10 +41,10 @@ file_frame = tk.LabelFrame(root,text="Seleccione un archivo para trabajar")
 file_frame.place(height=100,width=400,rely=0.75,relx=0.01)
 
 #botones
-button1= tk.Button(file_frame, text="Buscar",command=lambda: File_dialog())  #   TO DO : COMMAND
+button1= tk.Button(file_frame,text="Armar Arbol", command=lambda: Load_excel_data() )  #   TO DO : COMMAND
 button1.place(rely=0.65,relx=0.65)
 #lambdas permite reiniciar la funcion cada vez
-button2 = tk.Button(file_frame, text="Armar Arbol", command=lambda: Load_excel_data()) # falta hacer el comando 
+button2 = tk.Button(file_frame,text="Buscar",command=lambda: File_dialog() ) # falta hacer el comando 
 button2.place(rely=0.65,relx=0.3)
 
 
@@ -102,7 +102,8 @@ def File_dialog(): #solicita el archivo y lo carga
     return None
     
     
-def Load_excel_data(): #ejecuta el algortmo 
+def Load_excel_data(): #ejecuta el algortmo
+    global col_gan, total_rows, total_columns, t, lst, col_tasa 
     file_path=label_file["text"]
     try:
         csv_filename=r"{}".format(file_path)
@@ -111,19 +112,10 @@ def Load_excel_data(): #ejecuta el algortmo
         tk.messagebox.showerror("Error","No hay archivo seleccionado")
         return None
     
-    Graficar(df)
-    root.state(newstate = "withdraw")
-    window.state(newstate = "zoomed")
-    return None
-
-
-
-def Graficar(df):
-    global col_gan, total_rows, total_columns, t, lst, col_tasa
     col_gan=[]
     col_tasa=[]
-    col_gan=arbolGanancia(df)
-    col_tasa=arbolTasa(df)
+    arbol(df)
+    #arbolTasa(df)
     # Tomamos la datac
     lst = [('',col_gan[0], 'TASA DE GANANCIA'),
     ("Cantidad de caminos",col_gan[1],col_tasa[1]),
@@ -136,10 +128,17 @@ def Graficar(df):
     total_columns = len(lst[0])
 
     t = Table(tab3)
-   
+
+    #cambiar de ventana 1->2
+    root.state(newstate = "withdraw")
+    window.state(newstate = "zoomed")
+
     return None
 
-def arbolGanancia(df):
+
+
+
+def arbol(df):
     global d, e, f, col_gan
     col_gan=[]
     listaAtr = df.columns
@@ -173,11 +172,9 @@ def arbolGanancia(df):
     d,e,f=cuadroComp(TG)
     
     col_gan=[['GANANCIA'],[d],[e],[f],[len(listaNodosDec)]]
-    return col_gan
 
-
-def arbolTasa(df):
     global a, b, c, col_tasa
+    
     col_tasa=[]
     listaAtr = df.columns
     cla = listaAtr[-1]
@@ -187,31 +184,33 @@ def arbolTasa(df):
     TT= nx.DiGraph()
     listaNodosPuros=[]
     it.c4_5(df,listaAtr,cla,listaNodosDec, 0.1,TT,0,0,0,listaNodosPuros) 
-    pos = nx.nx_pydot.graphviz_layout(TT) #graphviz genera la posicion de los nodos
-    nx.draw_networkx(TT, pos) #dibujar el grafo 
-    A = nx.nx_agraph.to_agraph(TT) # to_agraph --> Returns a pygraphviz graph from a NetworkX graph N.
-    A.layout()
-    A.draw('TT')
+    pos2 = nx.nx_pydot.graphviz_layout(TT) #graphviz genera la posicion de los nodos
+    nx.draw_networkx(TT, pos2) #dibujar el grafo 
+    A2 = nx.nx_agraph.to_agraph(TT) # to_agraph --> Returns a pygraphviz graph from a NetworkX graph N.
+    A2.layout()
+    A2.draw('TT')
     nx.drawing.nx_pydot.write_dot(TT, 'TT') #genera el script , creo q no lo necesitamos 
     gv.render('dot', 'png', 'TT')
     
     #Imagen pestaña 2 || SE CARGA LA IMAGEN
-    img= Image.open("TT.png") #lee la imagen
-    ancho = img.size[0] #guarda el ancho de la imagen ingresada
-    largo = img.size[1] # guarda el largo de la imagen ingresada 
-    img=img.resize((ancho,largo),Image.ANTIALIAS) # modifica el tamaño de la imagen
+    img2= Image.open("TT.png") #lee la imagen
+    ancho = img2.size[0] #guarda el ancho de la imagen ingresada
+    largo = img2.size[1] # guarda el largo de la imagen ingresada 
+    img2=img2.resize((ancho,largo),Image.ANTIALIAS) # modifica el tamaño de la imagen
 
     lienzo2.config(scrollregion=(0, 0, ancho, largo))
 
-    img= ImageTk.PhotoImage(img)
+    img2= ImageTk.PhotoImage(img2)
 
-    lienzo2.create_image(0, 0, anchor="nw", image=img, tag="img2")
+    lienzo2.create_image(0, 0, anchor="nw", image=img2, tag="img2")
 
     a,b,c=cuadroComp(TT)
 
     col_tasa=[['TASA DE GANANCIA'],[a],[b],[c],[len(listaNodosDec)]]
 
-    return col_tasa
+
+    return None
+
 
 
 
@@ -220,11 +219,15 @@ def clear_data():
 
 
 def volver_p1(): #funcion del boton volver de la pantalla 2
-    window.state(newstate="withdraw")
-    root.state(newstate="normal")
-    lienzo.delete("all") #agregue
-    lienzo2.delete("all") #agregue
-    #lienzo.delete("all") #agregue
+    #cambiar pantalla 2->1
+    window.state(newstate="withdraw") 
+    #root.state(newstate="normal")
+  
+    root.deiconify()
+    
+    #limpiar los lienzos
+    lienzo.delete("img") #agregue
+    lienzo2.delete("img2") #agregue
     
 
 #-------------------- PANTALLA 2 ----------------------------
@@ -246,18 +249,13 @@ tab1 = tk.Frame(tab_control)
 tab_control.add(tab1, text='Ganancia')
 #PESTAÑA 2
 tab2 = tk.Frame(tab_control)
-#tab2.configure( font=("Roboto Cn", 18))
 tab_control.add(tab2, text='Tasa de Ganancia')
 #PESTAÑA 3
 tab3 = tk.Frame(tab_control)
-#tab3.config(bg='white')
 tab_control.add(tab3, text='Comparacion')
-# fontStyle = font(family="Lucida Grande", size=20)
-# fontStyle.configure(size=10)
+
 tab_control.pack(expand=1, fill='both') 
 
-# s = ttk.Style()
-# s.configure('TNotebook.Tab', font=('IBM Plex Sans','14','bold') )
 
 s = ttk.Style()
 s.theme_create( "MyStyle", parent="alt", settings={
@@ -274,12 +272,16 @@ s.theme_use("MyStyle")
                                         
 #Lienzo tab1
 lienzo = Canvas(tab1, bg='white', highlightthickness=0, relief='ridge')
+
 sbarV = tk.Scrollbar(tab1, orient=tk.VERTICAL, command=lienzo.yview)
 sbarH = tk.Scrollbar(tab1, orient=tk.HORIZONTAL, command=lienzo.xview)
+
 sbarV.pack(side=tk.RIGHT, fill=tk.Y )
 sbarH.pack(side=tk.BOTTOM, fill=tk.X)
+
 lienzo.config(yscrollcommand=sbarV.set)
 lienzo.config(xscrollcommand=sbarH.set)
+
 lienzo.pack(side=tk.TOP, expand=True, fill=tk.BOTH) #opcion nueva fede (expand=True, fill="both", side="top")
 
 #Funcion que permite guardar en el diccionario anterior los datos de un objeto sobre el que presionamos con el raton
@@ -309,13 +311,16 @@ lienzo.tag_bind("img", "<B1-Motion>",imgMotion)
 
 #Lienzo tab2
 lienzo2 = Canvas(tab2, bg='white' , highlightthickness=0, relief='ridge')
+
 sbarV2 = tk.Scrollbar(tab2, orient=tk.VERTICAL, command=lienzo2.yview)
 sbarH2 = tk.Scrollbar(tab2, orient=tk.HORIZONTAL, command=lienzo2.xview)
+
 sbarV2.pack(side=tk.RIGHT, fill=tk.Y)
 sbarH2.pack(side=tk.BOTTOM, fill=tk.X)
 
 lienzo2.config(yscrollcommand=sbarV2.set)
 lienzo2.config(xscrollcommand=sbarH2.set)
+
 lienzo2.pack(side=tk.TOP, expand=True, fill=tk.BOTH) #opcion nueva fede (expand=True, fill="both", side="top")
 
 #Funcion que permite guardar en el diccionario anterior los datos de un objeto sobre el que presionamos con el raton
@@ -351,7 +356,7 @@ volver.pack(pady=30)
 buttonE= tk.Button(volver, text="Volver", width=10,height=2, command=lambda:volver_p1())
 buttonE.pack()
 
-#etiqueta donde esta la tabla 
+#clase tabla comparativo 
 class Table:
       
     def __init__(self,root):
