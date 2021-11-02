@@ -17,15 +17,21 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 import pydot
 
-from probando import Zoom_Advanced
 
 #---------------PANTALLA 1 ---------------------------------
 root=tk.Tk()
-root.geometry("900x500") #ancho por alto
 root.pack_propagate(False) #para que  no se cambie el tamaño 
 root.title("C4.5 NAKS")
+ancho_ventana = 900
+alto_ventana = 500
+x_ventana = root.winfo_screenwidth() // 2 - ancho_ventana // 2
+y_ventana = root.winfo_screenheight() // 2 - alto_ventana // 2
+posicion = str(ancho_ventana) + "x" + str(alto_ventana) + "+" + str(x_ventana) + "+" + str(y_ventana)
+root.geometry(posicion)
 root.resizable(width=False , height=False)
 root.iconbitmap('pine-tree.ico')
+
+
 
 global a , b , c, col_gan, total_rows, total_columns, t, lst, col_tasa #probar si se puede eliminar
 
@@ -151,7 +157,7 @@ def Ejecutar(): #ejecuta el algortmo
     total_rows = len(lst)
     total_columns = len(lst[0])
 
-    t = Table(tab3)
+    armarTabla(total_rows,total_columns)
 
     #cambiar de ventana 1->2
     root.state(newstate = "withdraw")
@@ -373,23 +379,18 @@ volver.pack(pady=30)
 buttonE= tk.Button(volver, text="Volver", width=10,height=2, command=lambda:volver_p1())
 buttonE.pack()
 
-#clase tabla comparativo 
-class Table:
-      
-    def __init__(self,root):
-          
-        # code for creating table
-        for i in range(total_rows):
-            for j in range(total_columns):
-                if i ==0: 
-                    self.e = Entry(root, width=35,fg='black',
-                               font=('IBM Plex Sans',25,BOLD), justify="center")
-                else:
-                    self.e = Entry(root, width=35,fg='black',
-                               font=('IBM Plex Sans',25), justify="center")  
-                self.e.grid(row=i, column=j,ipady=40,sticky="n")
-                self.e.insert(END, lst[i][j]) #inserta texto VER COMO PONER LO DE MAJO
-                self.e.configure(state='readonly', borderwidth=5, relief=GROOVE, bg="white") #hace que no sea editable 
+
+def armarTabla(total_rows,total_columns):
+    for i in range(total_rows): #Rows
+        for j in range(total_columns): #Columns
+            if i ==0:
+                b = Entry(tab3, width=25,fg='black',font=('IBM Plex Sans',14,BOLD), justify="center")
+            else:
+                b = Entry(tab3, width=25,fg='black',font=('IBM Plex Sans',14), justify="center")
+            b.grid(row=i, column=j,ipady=30,sticky="n")
+            b.insert(END, lst[i][j]) 
+            b.configure(state='readonly', borderwidth=5, relief=GROOVE, bg="white") #hace que no sea editable 
+    
 
 def on_closing():
     if messagebox.askokcancel("CERRAR", "¿Seguro que quiere salir?"):
