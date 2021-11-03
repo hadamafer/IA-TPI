@@ -22,6 +22,7 @@ import pydot
 root=tk.Tk()
 root.pack_propagate(False) #para que  no se cambie el tamaño 
 root.title("C4.5 NAKS")
+#root.state(newstate='zoomed')
 ancho_ventana = 900
 alto_ventana = 500
 x_ventana = root.winfo_screenwidth() // 2 - ancho_ventana // 2
@@ -31,9 +32,14 @@ root.geometry(posicion)
 root.resizable(width=False , height=False)
 root.iconbitmap('pine-tree.ico')
 
-
-
 global a , b , c, col_gan, total_rows, total_columns, t, lst, col_tasa #probar si se puede eliminar
+
+frame_e= tk.LabelFrame(root, text="Digite Treshold")
+frame_e.place(height=55,width=180,rely=0.75,relx=0.50)
+entry = tk.Entry(root, width=5,text="Ingrese thc")
+entry.pack(side=BOTTOM,anchor="e", pady=80,padx=370)
+entry.insert(0, "0")
+print("valor del entry",entry.get())
 
 #TEMA
 s = ttk.Style()
@@ -45,9 +51,12 @@ s.theme_create( "MyStyle", parent="alt", settings={
                                                       ("active", "#e2c275")],
                                        "foreground": [("selected", "#000000"),
                                                       ("active", "#000000")]}},
-        "Treeview":{"configure":{"font" : ('IBM Plex Sans','12') }},
+        "Treeview":{"configure":{"font" : ('IBM Plex Sans','12'), "sticky":"", "borderwidth":"5" }},
         "Treeview.Heading":{"configure": {"background": "white",
-                                        "font" : ('IBM Plex Sans','12','') }}})
+                                        "font" : ('IBM Plex Sans','12'), "type":"BOLD"}},
+        "Treeview.Field":{"configure": {"background": "white",
+                                        "font" : ('IBM Plex Sans','12')}}})
+        
 
 s.theme_use("MyStyle")
 
@@ -98,6 +107,8 @@ class Error(Exception):
 class ValorVacio(Error):
     """Raised when the input value is too large"""
     pass
+class threshold(Error):
+    pass
 
 #funciones PANTALLA 1
 def Busqueda(): #solicita el archivo y lo carga
@@ -119,7 +130,7 @@ def Busqueda(): #solicita el archivo y lo carga
         except ValorVacio:             
             tk.messagebox.showerror("Advertencia","El archivo contiene valores vacios")
             return None
-    clear_data()        
+    clear_data()       
     tv1["column"] = list(df.columns)
     tv1["show"]="headings"
     for column in tv1["columns"]:
@@ -136,9 +147,14 @@ def Ejecutar(): #ejecuta el algortmo
     file_path=label_file["text"]
     try:
         csv_filename=r"{}".format(file_path)
-        df = pd.read_csv(csv_filename,sep='[;,,]', engine= 'python')  
+        df = pd.read_csv(csv_filename,sep='[;,,]', engine= 'python')
+        if float(entry.get())>1:
+            raise threshold  
     except FileNotFoundError:
         tk.messagebox.showerror("Error","No hay archivo seleccionado")
+        return None
+    except threshold:
+        tk.messagebox.showerror("Advertencia","El valor de threshold no es valido. \nPor favor, ingrese un valor entre 0 y 1.")
         return None
     
     col_gan=[]
@@ -178,7 +194,8 @@ def arbol(df):
     listaNodosDec = []
     TG= nx.DiGraph()
     listaNodosPuros=[]
-    ig.c4_5_ganancia(df,listaAtr,cla,listaNodosDec, 0.1,TG,0,0,0,listaNodosPuros) 
+    th=float(entry.get())
+    ig.c4_5_ganancia(df,listaAtr,cla,listaNodosDec, th,TG,0,0,0,listaNodosPuros) 
     pos = nx.nx_pydot.graphviz_layout(TG) #graphviz genera la posicion de los nodos
     nx.draw_networkx(TG, pos) #dibujar el grafo 
     A = nx.nx_agraph.to_agraph(TG) # to_agraph --> Returns a pygraphviz graph from a NetworkX graph N.
@@ -215,7 +232,8 @@ def arbol(df):
     listaNodosDec2 = []
     TT= nx.DiGraph()
     listaNodosPuros2=[]
-    it.c4_5(df,listaAtr2,cla2,listaNodosDec2, 0.1,TT,0,0,0,listaNodosPuros2) 
+    th=float(entry.get())
+    it.c4_5(df,listaAtr2,cla2,listaNodosDec2,th,TT,0,0,0,listaNodosPuros2) 
     pos2 = nx.nx_pydot.graphviz_layout(TT) #graphviz genera la posicion de los nodos
     nx.draw_networkx(TT, pos2) #dibujar el grafo 
     A2 = nx.nx_agraph.to_agraph(TT) # to_agraph --> Returns a pygraphviz graph from a NetworkX graph N.

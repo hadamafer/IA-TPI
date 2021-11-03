@@ -1,17 +1,13 @@
-from tkinter import *
+import tkinter as tk
 
-root=Tk()
-ancho_ventana = 900
-alto_ventana = 500
+master = tk.Tk()
+tk.Label(master, text="First Name").grid(row=0)
+tk.Label(master, text="Last Name").grid(row=1)
 
-x_ventana = root.winfo_screenwidth() // 2 - ancho_ventana // 2
-y_ventana = root.winfo_screenheight() // 2 - alto_ventana // 2
+e1 = tk.Entry(master)
+e2 = tk.Entry(master)
 
-posicion = str(ancho_ventana) + "x" + str(alto_ventana) + "+" + str(x_ventana) + "+" + str(y_ventana)
-root.geometry(posicion)
+e1.grid(row=0, column=1)
+e2.grid(row=1, column=1)
 
-root.resizable(0,0)
-root.title("Ventana de ejemplo")
-
-
-root.mainloop()
+master.mainloop()
