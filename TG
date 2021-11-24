@@ -1,11 +1,19 @@
 strict digraph  {
-1 [label=Hipertenso, shape=box];
-2 [label=Trigliceridos, shape=box];
-3 [color=green, label=SI, shape=oval];
-4 [color=green, label=NO, shape=oval];
+1 [label=Edad, shape=box];
+2 [label=Hipertenso, shape=box];
+3 [color=green, label=NO, shape=oval];
+4 [color=green, label=SI, shape=oval];
 5 [color=green, label=SI, shape=oval];
-1 -> 2  [label=NO];
-1 -> 5  [label=SI];
-2 -> 3  [label=elevado];
-2 -> 4  [label=normal];
+6 [label=Colesterol, shape=box];
+7 [color=green, label=NO, shape=oval];
+8 [color=green, label=NO, shape=oval];
+9 [color=green, label=SI, shape=oval];
+1 -> 2  [label="entre40-60"];
+1 -> 5  [label=mayora60];
+1 -> 6  [label=menor40];
+2 -> 3  [label=NO];
+2 -> 4  [label=SI];
+6 -> 7  [label=Alto];
+6 -> 8  [label=Bajo];
+6 -> 9  [label=Medio];
 }

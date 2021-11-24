@@ -108,6 +108,7 @@ class threshold(Error):
     pass
 class train(Error):
     pass
+
 #funciones PANTALLA 1
 def Busqueda(): #solicita el archivo y lo carga
     filename=filedialog.askopenfilename(initialdir="/",title="Seleccionar archivo",filetype=(("CSV files","*.csv"),("All Files","*.*")))
@@ -146,15 +147,26 @@ def Ejecutar(): #ejecuta el algortmo
     try:
         csv_filename=r"{}".format(file_path)
         df = read_csv(csv_filename,sep='[;,,]', engine= 'python')
-        if float(th.get())>1:
-            raise threshold   
-        if float(p_train.get())>1:
-            raise train   
+    
     except FileNotFoundError:
         messagebox.showerror("Error","No hay archivo seleccionado")
         return None
+    try:
+       p1=float(th.get())
+       if p1>1:
+           raise  threshold
+    except ValueError:
+        messagebox.showerror("Advertencia","El valor de threshold no es valido. \nPor favor, ingrese ingrese el valor con punto(.).")
+        return None
     except threshold:
         messagebox.showerror("Advertencia","El valor de threshold no es valido. \nPor favor, ingrese un valor entre 0 y 1.")
+        return None
+    try:
+       p2=float(p_train.get())
+       if p2>1:
+           raise  train
+    except ValueError:
+        messagebox.showerror("Advertencia","El valor de training no es valido. \nPor favor, ingrese el valor con punto(.).")
         return None
     except train:
         messagebox.showerror("Advertencia","El valor de training no es valido. \nPor favor, ingrese un valor entre 0 y 1.")
