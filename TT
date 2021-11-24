@@ -1,0 +1,7 @@
+strict digraph  {
+1 [label=Programa, shape=box];
+2 [color=green, label=Libre, shape=oval];
+3 [color=green, label=Regular, shape=oval];
+1 -> 2  [label=NO];
+1 -> 3  [label=SI];
+}

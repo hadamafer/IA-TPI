@@ -7,12 +7,10 @@ from pandas.core.frame import DataFrame
 import funciones as pr
 #import controles as c
 
-def c4_5_tasa(df, listaAtr,clase,listaNodosDec,thc, T, edge, cont,  padrecont, listaNodosPuros):
-    cont = cont + 1
+def c4_5_tasa(df, listaAtr,clase,listaNodosDec,thc, T, edge,  padrecont, listaNodosPuros):
     data = df.values
     valoresClase = data[:, -1] #-1 nos da la ultima columna --> clase
     clasesUnicas, contClase = unique(valoresClase, return_counts=True)
-
     if (len(clasesUnicas) == 1) and (listaNodosDec != []):
         listaNodosDec.append(clasesUnicas[0])
         listaNodosPuros.append(clasesUnicas[0])
@@ -32,19 +30,19 @@ def c4_5_tasa(df, listaAtr,clase,listaNodosDec,thc, T, edge, cont,  padrecont, l
         T.add_edge(padrecont, idH, label = edge )
        
     else:
-        print("DATASET AL ENTRAR AL ELSE:  ", df)
         entConjunto = pr.entropia(df,clase) #p0
+        entConjunto=round(entConjunto,9)
         listaEnt = []
         for i in listaAtr: #pi
             x =pr.entropia_atr(df, i, clase)
+            x=round(x,9)
             listaEnt.append(x)
-        print("ENTROPIA ", listaEnt)
         listaGain = []
         for i in listaEnt:
             x=entConjunto-i
+            x=round(x,9)
             listaGain.append(x)
         listaGainRatio = []
-        print(listaGain)
         for i in listaGain:
             indice = list(listaGain).index(i)
             atributo = listaAtr[indice]
@@ -52,11 +50,12 @@ def c4_5_tasa(df, listaAtr,clase,listaNodosDec,thc, T, edge, cont,  padrecont, l
             if ent == 0:
                 res = 0
             else:
-                res = i / ent  
+                res = i / ent 
+            res= round(res,9)   
             listaGainRatio.append(res)
         
         maxGainRatio = max(listaGainRatio)
-        if (maxGainRatio <= thc):
+        if (maxGainRatio <= thc) and len(listaNodosDec) > 0:
             claseFrec = max(contClase)
             probabilidad = round(claseFrec / (df.shape[0]), 2)
             indice = list(contClase).index(claseFrec)
@@ -85,6 +84,6 @@ def c4_5_tasa(df, listaAtr,clase,listaNodosDec,thc, T, edge, cont,  padrecont, l
                 reg = particionAtr.get_group(i) #dataframe particionado con un solo valor que toma el nodo decision
                 edge = i
                 padrecont = x
-                c4_5_tasa(reg,listaAtr,clase,listaNodosDec, thc,T, edge, cont,  padrecont, listaNodosPuros) #llamada recursiva
+                c4_5_tasa(reg,listaAtr,clase,listaNodosDec, thc,T, edge,  padrecont, listaNodosPuros) #llamada recursiva
    
                 

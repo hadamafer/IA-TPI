@@ -12,37 +12,50 @@ from graphviz import render
 from networkx import draw_networkx
 from networkx.drawing.nx_agraph import graphviz_layout, to_agraph
 from networkx.drawing.nx_pydot import write_dot, graphviz_layout
+from networkx.utils.decorators import *
 from networkx.classes.digraph import DiGraph
 from PIL import ImageTk, Image
 
 #Chequear si posta las usamos 
-import matplotlib.pyplot as plt
-from matplotlib.pyplot import figure
-import pydot
+#import matplotlib.pyplot as plt
+#from matplotlib.pyplot import figure
+#import pydot
 
 #---------------PANTALLA 1 ---------------------------------
 root=Tk()
 root.geometry("900x500") #ancho por alto
 root.pack_propagate(False) #para que  no se cambie el tamaño 
 root.title("C4.5 NAKS")
+ancho_ventana = 900
+alto_ventana = 500
+x_ventana = root.winfo_screenwidth() // 2 - ancho_ventana // 2
+y_ventana = root.winfo_screenheight() // 2 - alto_ventana // 2
+posicion = str(ancho_ventana) + "x" + str(alto_ventana) + "+" + str(x_ventana) + "+" + str(y_ventana)
+root.geometry(posicion)
 root.resizable(width=False , height=False)
-root.iconbitmap('pine-tree.ico')
+#root.iconbitmap('pine-tree.ico')
 
 global a , b , c, col_gan, total_rows, total_columns, t, lst, col_tasa #probar si se puede eliminar
-
+frame_e= LabelFrame(root, text="Digite Treshold")
+frame_e.place(height=55,width=180,rely=0.75,relx=0.50)
+entry = Entry(root, width=5,text="Ingrese thc")
+entry.pack(side=BOTTOM,anchor="e", pady=80,padx=370)
+entry.insert(0, "0")
 #TEMA
 s = ttk.Style()
 s.theme_create( "MyStyle", parent="alt", settings={
         "TNotebook": {"configure": {"tabmargins": [0, 10, 2, 0]} },
-        "TNotebook.Tab": {"configure": {"padding": [150, 10],"background": "#eadca6",
-                                        "font" : ('IBM Plex Sans','14','bold') },
+        "TNotebook.Tab": {"configure": {"padding": [130, 10],"background": "#eadca6",
+                                        "font" : ('IBM Plex Sans','13','bold') },
                               "map": {"background": [("selected", "#c36a3d"), 
                                                       ("active", "#e2c275")],
                                        "foreground": [("selected", "#000000"),
                                                       ("active", "#000000")]}},
-        "Treeview":{"configure":{"font" : ('IBM Plex Sans','12') }},
+        "Treeview":{"configure":{"font" : ('IBM Plex Sans','12'), "sticky":"", "borderwidth":"5" }},
         "Treeview.Heading":{"configure": {"background": "white",
-                                        "font" : ('IBM Plex Sans','12','') }}})
+                                    "font" : ('IBM Plex Sans','12'), "type":"BOLD"}},
+        "Treeview.Field":{"configure": {"background": "white",
+                                        "font" : ('IBM Plex Sans','12')}}})
 
 s.theme_use("MyStyle")
 
@@ -62,29 +75,25 @@ button1.place(rely=0.65,relx=0.65)
 #lambdas permite reiniciar la funcion cada vez
 button2 = Button(file_frame,text="Buscar",command=lambda: Busqueda() ) # falta hacer el comando 
 button2.place(rely=0.65,relx=0.3)
-#button3 = tk.Button(file_frame, text="Graficar Arbol", command=lambda: Graficar()) # falta hacer el comando 
-#button3.place(rely=0.65,relx=0.85)
-
 label_file=ttk.Label(file_frame,text="Aún no se ha seleccionado nada")
 label_file.place(rely=0,relx=0)
-#parte del dataframe
+
 tv1 = ttk.Treeview(frame1)
 tv1.place(relheight=1, relwidth=1)
-
 #scrollbars del dataframe
 treescrolly = Scrollbar(frame1, orient="vertical", command=tv1.yview) #barra scroll verticaal
 treescrollx=Scrollbar(frame1,orient="horizontal",command=tv1.xview) #barra horizontal 
 tv1.configure(xscrollcommand=treescrollx.set,yscrollcommand=treescrolly.set) #agrega las barras en la label
 treescrollx.pack(side="bottom", fill="x") #posiciones relativas de los scrolls
 treescrolly.pack(side="right",fill="y")
-
 class Error(Exception):
     """Base class for other exceptions"""
     pass
 class ValorVacio(Error):
     """Raised when the input value is too large"""
     pass
-
+class threshold(Error):
+    pass
 #funciones PANTALLA 1
 def Busqueda(): #solicita el archivo y lo carga
     filename=filedialog.askopenfilename(initialdir="/",title="Seleccionar archivo",filetype=(("CSV files","*.csv"),("All Files","*.*")))
@@ -122,11 +131,15 @@ def Ejecutar(): #ejecuta el algortmo
     file_path=label_file["text"]
     try:
         csv_filename=r"{}".format(file_path)
-        df = read_csv(csv_filename,sep='[;,,]', engine= 'python')     
+        df = read_csv(csv_filename,sep='[;,,]', engine= 'python')
+        if float(entry.get())>1:
+            raise threshold      
     except FileNotFoundError:
         messagebox.showerror("Error","No hay archivo seleccionado")
         return None
-
+    except threshold:
+        messagebox.showerror("Advertencia","El valor de threshold no es valido. \nPor favor, ingrese un valor entre 0 y 1.")
+        return None
     col_gan=[]
     col_tasa=[]
 
@@ -143,7 +156,7 @@ def Ejecutar(): #ejecuta el algortmo
     total_rows = len(lst)
     total_columns = len(lst[0])
 
-    t = Table(tab3)
+    armarTabla(total_rows, total_columns)
     #cambiar de ventana 1->2
     root.state(newstate = "withdraw")
     window.state(newstate = "zoomed")
@@ -162,8 +175,9 @@ def arbol(df):
     listaNodosDec = []
     TG= DiGraph()
     listaNodosPuros=[]
+    th=float(entry.get())
     #Llamada
-    ig.c4_5_ganancia(df,listaAtr,cla,listaNodosDec, 0.01,TG,0,0,0,listaNodosPuros) 
+    ig.c4_5_ganancia(df,listaAtr,cla,listaNodosDec, th,TG,0,0,listaNodosPuros) 
     #Grafico ARBOL CON GANANCIA
     pos = graphviz_layout(TG) #graphviz genera la posicion de los nodos
     draw_networkx(TG, pos) #dibujar el grafo 
@@ -196,7 +210,8 @@ def arbol(df):
     listaNodosDec2 = []
     TT= DiGraph()
     listaNodosPuros2=[]
-    it.c4_5_tasa(df,listaAtr2,cla2,listaNodosDec2, 0.01,TT,0,0,0,listaNodosPuros2) 
+    th=float(entry.get())
+    it.c4_5_tasa(df,listaAtr2,cla2,listaNodosDec2, th,TT,0,0,listaNodosPuros2) 
     pos2 = graphviz_layout(TT, prog = 'dot') #graphviz genera la posicion de los nodos
     draw_networkx(TT, pos2) #dibujar el grafo s
     write_dot(TT, 'TT') #genera el script , creo q no lo necesitamos 
@@ -210,7 +225,7 @@ def arbol(df):
     img2= ImageTk.PhotoImage(img2)
     lienzo2.create_image(0, 0, anchor="nw", image=img2, tag="img2")
     a,b,c=cuadroComp(TT)
-    col_tasa=[['TASA DE GANANCIA'],[a],[b],[c],[len(listaNodosDec)]]
+    col_tasa=[['TASA DE GANANCIA'],[a],[b],[c],[len(listaNodosDec2)]]
     return None
 
 def clear_data():
@@ -225,9 +240,9 @@ def volver_p1(): #funcion del boton volver de la pantalla 2
 window = Toplevel() #para otras pantallas toplevel, para el main root
 window.state('withdraw') #hace que arranque fullscreen
 window.resizable(width=True , height=True) # si se comenta la sentancia anterior anda y lo que ahce es adaprtarse al tamaño de la imagen 
-#window.pack_propagate(False) #para que  no se cambie el tamaño
+
 window.title("C4.5 NAKS")
-window.iconbitmap('pine-tree.ico')
+#window.iconbitmap('pine-tree.ico')
 #Creamos un diccionario que nos permmita guardar las coordenadas y el nombre del objeto
 posicion = {"x": 0, "y": 0, "img": None}
 tab_control = ttk.Notebook(window)
@@ -273,7 +288,6 @@ lienzo.tag_bind("img", "<ButtonPress-1>", imgPress)
 lienzo.tag_bind("img", "<ButtonRelease-1>", imgRelease)
 lienzo.tag_bind("img", "<B1-Motion>",imgMotion)
 #TERMINA LIENZO TAB1
-
 #Lienzo tab2
 lienzo2 = Canvas(tab2, bg='white' , highlightthickness=0, relief='ridge')
 sbarV2 = Scrollbar(tab2, orient=VERTICAL, command=lienzo2.yview)
@@ -304,7 +318,6 @@ def imgMotion2(event):
 lienzo2.tag_bind("img2", "<ButtonPress-1>", imgPress2)
 lienzo2.tag_bind("img2", "<ButtonRelease-1>", imgRelease2)
 lienzo2.tag_bind("img2", "<B1-Motion>",imgMotion2)
-
 #TERMINA LIENZO TAB 2 
 #etiqueta del boton volver
 volver = LabelFrame(window)
@@ -312,23 +325,26 @@ volver.place(relx=50, rely=50, height= 50)
 volver.pack(pady=30)
 buttonE= Button(volver, text="Volver", width=10,height=2, command=lambda:volver_p1())
 buttonE.pack()
-
-
 #clase tabla comparativo 
-class Table:   
-    def __init__(self,root):
-        # code for creating table
-        for i in range(total_rows):
-            for j in range(total_columns):
-                if i ==0: 
-                    self.e = Entry(root, width=35,fg='black',
-                               font=('Arial',25,BOLD), justify="center")
-                else:
-                    self.e = Entry(root, width=35,fg='black',
-                               font=('IBM Plex Sans',25), justify="center")  
-                self.e.grid(row=i, column=j,ipady=40,sticky="n")
-                self.e.insert(END, lst[i][j]) #inserta texto VER COMO PONER LO DE MAJO
-                self.e.configure(state='readonly', borderwidth=5, relief=GROOVE, bg="white") #hace que no sea editable 
+def armarTabla(total_rows,total_columns):
+    for i in range(total_rows): #Rows
+        for j in range(total_columns): #Columns
+            if i ==0:
+                b = Entry(tab3, width=25,fg='black',font=('IBM Plex Sans',14,BOLD), justify="center")
+            else:
+                b = Entry(tab3, width=25,fg='black',font=('IBM Plex Sans',14), justify="center")
+            b.grid(row=i, column=j,ipady=30,sticky="n")
+            b.insert(END, lst[i][j]) 
+            b.configure(state='readonly', borderwidth=5, relief=GROOVE, bg="white") #hace que no sea editable 
+    
+
+def on_closing():
+    if messagebox.askokcancel("CERRAR", "¿Seguro que quiere salir?"):
+        root.destroy()
+ 
+window.protocol("WM_DELETE_WINDOW", on_closing)
+root.protocol("WM_DELETE_WINDOW", on_closing)
+ 
 
 
 root.mainloop()

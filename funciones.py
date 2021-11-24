@@ -11,9 +11,7 @@ def entropia(dataFrame, clase):
     sumatoria = 0 
     for i in range (len(counts[0])):
         probabilidad = counts[1][i] / len(dataFrame) 
-        #print('probabilidad num: ', i, 'es :', probabilidad)
         sumatoria = sumatoria - (probabilidad * (log(probabilidad,2))) 
-        #print('sumat num: ', i, 'es :', sumatoria)
     return sumatoria
 
 def entropia_atr(df, atributo,clase ): #entradas --> todo el conjunto,nombre atributo, nombre clase(sacar de columnas) 
@@ -22,17 +20,12 @@ def entropia_atr(df, atributo,clase ): #entradas --> todo el conjunto,nombre atr
     suma = 0 
     cont=0
     for i in (valores[0]):
-        #print('PASADA DE: ', i)
         reg = groups.get_group(i) #agrupa el dataframe segun el valor 
-        #print('conjunto particion: ', reg)
-        #print('del valor:', i, 'hay:', counts)
         probabilidad = valores[1][cont] / len(df) 
         cont += 1
-        #print('la probabilidad del valor ', i, 'es: ', probabilidad)
         result = entropia(reg, clase) 
-        #print('el resultado de la entropia es: ', result)
         suma = suma + (probabilidad * result)
-        #print('la entropia del atributo es: ', suma) 
+
     return suma
 
 def cuadroComp(T):
@@ -45,7 +38,7 @@ def cuadroComp(T):
             paths = all_simple_paths(T, root, leaf)
             all_paths.extend(paths)
     profundidad =shortest_path_length(T,1)
-    profundidad = max(profundidad.values())
+    profundidad = max(profundidad.values()) +1
     count = []
     for nodo in all_paths:
         nodo = nodo [:-1]

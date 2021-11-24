@@ -4,7 +4,7 @@ from numpy import unique, delete
 import funciones as pr
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
-import graphviz as gv
+
 from pandas import Grouper, read_csv
 from networkx.drawing import nx_pydot
 from networkx.drawing.nx_agraph import graphviz_layout
@@ -13,13 +13,10 @@ from pandas.core.frame import DataFrame
 
 #import controles as c
 
-def c4_5_ganancia(df, listaAtr,clase,listaNodosDec,thc, T, edge, cont, padrecont, listaNodosPuros):
-    print("no termino", cont)
-    cont = cont + 1
+def c4_5_ganancia(df, listaAtr,clase,listaNodosDec,thc, T, edge,  padrecont, listaNodosPuros):
     data = df.values
     valoresClase = data[:, -1] #-1 nos da la ultima columna --> clase
     clasesUnicas, contClase = unique(valoresClase, return_counts=True)
-    print("LOS VALORES DE CLASE AL ENTRAR SON", clasesUnicas, contClase)
     if (len(clasesUnicas) == 1) and (listaNodosDec != []):
         listaNodosPuros.append(clasesUnicas[0])
         listaNodosDec.append(clasesUnicas[0])  
@@ -42,16 +39,18 @@ def c4_5_ganancia(df, listaAtr,clase,listaNodosDec,thc, T, edge, cont, padrecont
     else:
 
         entConjunto = pr.entropia(df,clase) #p0
+        entConjunto=round(entConjunto,4)
         listaEnt = []
         for i in listaAtr: #pi
             x =pr.entropia_atr(df, i, clase)
+            x=round(x,4)
             listaEnt.append(x)
         listaGain = []
         for i in listaEnt:
             x=entConjunto-i
+            x=round(x,4)
             listaGain.append(x)
         maxGan = max(listaGain) #seleccionar el que nos da la men or la impureza
-        print('MAXIMA GANANCIA ', maxGan, 'CONT', cont)
         if (maxGan<thc):
             claseFrec = max(contClase)
             probabilidad = round(claseFrec / (df.shape[0]), 2)
@@ -65,8 +64,6 @@ def c4_5_ganancia(df, listaAtr,clase,listaNodosDec,thc, T, edge, cont, padrecont
         else:
             indice = listaGain.index(maxGan) #si hay 2 o + iguales toma como mayor al primero q encunetra
             nodoDecision =  listaAtr[indice] #nombre del atributo
-            print("PROX NODO DEC", nodoDecision)
-            print(listaGain)
             listaNodosDec.append(nodoDecision)
             listaAtr = delete(listaAtr,indice) #eliminamos el atributo que es el nodo decision de la lista de atributo
             valores = unique(df[nodoDecision]) #que valores toma el nodo decision
@@ -81,9 +78,7 @@ def c4_5_ganancia(df, listaAtr,clase,listaNodosDec,thc, T, edge, cont, padrecont
 
             for i in valores: #vamos por las ramas
                 reg = particionAtr.get_group(i) #dataframe particionado con un solo valor que toma el nodo decision
-                if nodoDecision == "Third":
-                    print(reg)
                 edge = i
                 padrecont = x
-                c4_5_ganancia(reg,listaAtr,clase,listaNodosDec, thc,T, edge, cont,  padrecont, listaNodosPuros) #llamada recursiva
+                c4_5_ganancia(reg,listaAtr,clase,listaNodosDec, thc,T, edge,  padrecont, listaNodosPuros) #llamada recursiva
 
