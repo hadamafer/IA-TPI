@@ -1,8 +1,9 @@
 from tkinter import  filedialog,messagebox, ttk, GROOVE
-from tkinter import Entry
+from tkinter import Entry,StringVar
 from tkinter import font, Canvas, Tk, LabelFrame, Button, Scrollbar, Toplevel,  messagebox 
 from tkinter import TOP, BOTH, BOTTOM, RIGHT,LEFT, VERTICAL, HORIZONTAL, Y, X, END
 from tkinter.font import BOLD
+from networkx.generators.directed import random_k_out_graph
 from pandas.core import frame
 from pandas import read_csv
 from funciones import cuadroComp, control_id
@@ -38,9 +39,20 @@ root.resizable(width=False , height=False)
 global a , b , c, col_gan, total_rows, total_columns, t, lst, col_tasa #probar si se puede eliminar
 frame_e= LabelFrame(root, text="Digite Treshold")
 frame_e.place(height=55,width=180,rely=0.75,relx=0.50)
-entry = Entry(root, width=5,text="Ingrese thc")
-entry.pack(side=BOTTOM,anchor="e", pady=80,padx=370)
-entry.insert(0, "0")
+text = StringVar()
+text.set("0.1")
+th = Entry(frame_e, width=5,textvariable=text)
+th.pack()
+#th.insert(0, "0")
+
+frame_e2= LabelFrame(root, text="Porcentaje de Training set")
+frame_e2.place(height=55,width=180,rely=0.75,relx=0.75)
+text2 = StringVar()
+
+text2.set("0.7")
+p_train = Entry(frame_e2, width=5,textvariable=text2)
+p_train.pack()
+#p_train.insert(0, "0.7")
 #TEMA
 s = ttk.Style()
 s.theme_create( "MyStyle", parent="alt", settings={
@@ -94,6 +106,8 @@ class ValorVacio(Error):
     pass
 class threshold(Error):
     pass
+class train(Error):
+    pass
 #funciones PANTALLA 1
 def Busqueda(): #solicita el archivo y lo carga
     filename=filedialog.askopenfilename(initialdir="/",title="Seleccionar archivo",filetype=(("CSV files","*.csv"),("All Files","*.*")))
@@ -132,20 +146,33 @@ def Ejecutar(): #ejecuta el algortmo
     try:
         csv_filename=r"{}".format(file_path)
         df = read_csv(csv_filename,sep='[;,,]', engine= 'python')
-        if float(entry.get())>1:
-            raise threshold      
+        if float(th.get())>1:
+            raise threshold   
+        if float(p_train.get())>1:
+            raise train   
     except FileNotFoundError:
         messagebox.showerror("Error","No hay archivo seleccionado")
         return None
     except threshold:
         messagebox.showerror("Advertencia","El valor de threshold no es valido. \nPor favor, ingrese un valor entre 0 y 1.")
         return None
+    except train:
+        messagebox.showerror("Advertencia","El valor de training no es valido. \nPor favor, ingrese un valor entre 0 y 1.")
+        return None
     col_gan=[]
     col_tasa=[]
 
-    arbol(df) #CREA ARBOL TASA Y GANANCIA 
+    shuffle_df = df.sample(frac=1) #mezcla el dataset
 
-     # Tomamos la datac
+    train_size = int(float(p_train.get()) * len(df))
+
+    train_set = shuffle_df[:train_size]
+    test_set = shuffle_df[train_size:]
+
+    arbol(train_set) #CREA ARBOL TASA Y GANANCIA 
+    print(train_set)
+
+    # Tomamos la datac
     lst = [('',col_gan[0], 'TASA DE GANANCIA'),
     ("Cantidad de caminos",col_gan[1],col_tasa[1]),
     ('Profundidad Maxima',col_gan[2],col_tasa[2]),
@@ -175,9 +202,9 @@ def arbol(df):
     listaNodosDec = []
     TG= DiGraph()
     listaNodosPuros=[]
-    th=float(entry.get())
+    thh=float(th.get())
     #Llamada
-    ig.c4_5_ganancia(df,listaAtr,cla,listaNodosDec, th,TG,0,0,listaNodosPuros) 
+    ig.c4_5_ganancia(df,listaAtr,cla,listaNodosDec, thh,TG,0,0,listaNodosPuros) 
     #Grafico ARBOL CON GANANCIA
     pos = graphviz_layout(TG) #graphviz genera la posicion de los nodos
     draw_networkx(TG, pos) #dibujar el grafo 
@@ -210,8 +237,8 @@ def arbol(df):
     listaNodosDec2 = []
     TT= DiGraph()
     listaNodosPuros2=[]
-    th=float(entry.get())
-    it.c4_5_tasa(df,listaAtr2,cla2,listaNodosDec2, th,TT,0,0,listaNodosPuros2) 
+    thh=float(th.get())
+    it.c4_5_tasa(df,listaAtr2,cla2,listaNodosDec2, thh,TT,0,0,listaNodosPuros2) 
     pos2 = graphviz_layout(TT, prog = 'dot') #graphviz genera la posicion de los nodos
     draw_networkx(TT, pos2) #dibujar el grafo s
     write_dot(TT, 'TT') #genera el script , creo q no lo necesitamos 
