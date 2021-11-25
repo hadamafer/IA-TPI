@@ -182,7 +182,6 @@ def Ejecutar(): #ejecuta el algortmo
     test_set = shuffle_df[train_size:]
 
     arbol(train_set) #CREA ARBOL TASA Y GANANCIA 
-    print(train_set)
 
     # Tomamos la datac
     lst = [('',col_gan[0], 'TASA DE GANANCIA'),
@@ -195,7 +194,20 @@ def Ejecutar(): #ejecuta el algortmo
     total_rows = len(lst)
     total_columns = len(lst[0])
 
-    armarTabla(total_rows, total_columns)
+    armarTabla(lst,total_rows, total_columns,tab3)#tabla ventana 3
+    
+
+    lst = [('','GANANCIA', 'TASA DE GANANCIA'),
+    ("Presicion",'presicion de ganancia','presicion de tasa')]
+    total_rows = len(lst)
+    total_columns = len(lst[0])
+    armarTabla(lst,total_rows, total_columns,tab4)#tabla ventana 4
+
+    #VER COMO SE HARIA LA TABLA DE MATRIZ DE CONFUSION 
+
+    #armarTabla(lst,total_rows, total_columns,tab5)#tabla ventana 5
+
+
     #cambiar de ventana 1->2
     root.state(newstate = "withdraw")
     window.state(newstate = "zoomed")
@@ -373,13 +385,13 @@ volver.pack(pady=30)
 buttonE= Button(volver, text="Volver", width=10,height=2, command=lambda:volver_p1())
 buttonE.pack()
 #clase tabla comparativo 
-def armarTabla(total_rows,total_columns):
+def armarTabla(lst,total_rows,total_columns,frame):
     for i in range(total_rows): #Rows
         for j in range(total_columns): #Columns
             if i ==0:
-                b = Entry(tab3, width=25,fg='black',font=('IBM Plex Sans',14,BOLD), justify="center")
+                b = Entry(frame, width=25,fg='black',font=('IBM Plex Sans',14,BOLD), justify="center")
             else:
-                b = Entry(tab3, width=25,fg='black',font=('IBM Plex Sans',14), justify="center")
+                b = Entry(frame, width=25,fg='black',font=('IBM Plex Sans',14), justify="center")
             b.grid(row=i, column=j,ipady=30,sticky="n")
             b.insert(END, lst[i][j]) 
             b.configure(state='readonly', borderwidth=5, relief=GROOVE, bg="white") #hace que no sea editable 
