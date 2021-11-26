@@ -17,6 +17,7 @@ from networkx.utils.decorators import *
 from networkx.classes.digraph import DiGraph
 from PIL import ImageTk, Image
 
+
 #Chequear si posta las usamos 
 #import matplotlib.pyplot as plt
 #from matplotlib.pyplot import figure
@@ -71,7 +72,6 @@ s.theme_create( "MyStyle", parent="alt", settings={
 
 s.theme_use("MyStyle")
 
-
 # ----------------------------------------------------------------------------------
 #frame para ver el excel 
 frame1 =LabelFrame(root, text="")
@@ -111,9 +111,9 @@ class train(Error):
 
 #funciones PANTALLA 1
 def Busqueda(): #solicita el archivo y lo carga
-    filename=filedialog.askopenfilename(initialdir="/",title="Seleccionar archivo",filetype=(("CSV files","*.csv"),("All Files","*.*")))
+    filename=filedialog.askopenfilename(title="Seleccionar archivo",filetype=(("CSV files","*.csv"),("All Files","*.*")))
     label_file["text"]=filename
-    file_path=label_file["text"]
+    file_path=label_file["text"] 
     if file_path!=0: 
         try:
             csv_filename=r"{}".format(file_path)

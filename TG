@@ -1,11 +1,9 @@
 strict digraph  {
-1 [label=Hipertenso, shape=box];
-2 [label=Trigliceridos, shape=box];
+1 [label=Edad, shape=box];
+2 [color=green, label=SI, shape=oval];
 3 [color=green, label=SI, shape=oval];
 4 [color=green, label=NO, shape=oval];
-5 [color=green, label=SI, shape=oval];
-1 -> 2  [label=NO];
-1 -> 5  [label=SI];
-2 -> 3  [label=elevado];
-2 -> 4  [label=normal];
+1 -> 2  [label="entre40-60"];
+1 -> 3  [label=mayora60];
+1 -> 4  [label=menor40];
 }
