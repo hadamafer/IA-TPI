@@ -248,7 +248,8 @@ def arbol(df):
 
     d,e,f=cuadroComp(TG)
     
-    col_gan=[['GANANCIA'],[d],[e],[f],[len(listaNodosDec)]]
+    #col_gan=[['GANANCIA'],[d],[e],[f],[len(listaNodosDec)]]
+    col_gan=[['GANANCIA'],[d],[e],[len(listaNodosPuros)],[f]]
 
     #COMIENZA ARBOL TASA Y LIENZO 2
     global a, b, c, col_tasa
@@ -276,7 +277,8 @@ def arbol(df):
     img2= ImageTk.PhotoImage(img2)
     lienzo2.create_image(0, 0, anchor="nw", image=img2, tag="img2")
     a,b,c=cuadroComp(TT)
-    col_tasa=[['TASA DE GANANCIA'],[a],[b],[c],[len(listaNodosDec2)]]
+    #col_tasa=[['TASA DE GANANCIA'],[a],[b],[c],[len(listaNodosDec2)]]
+    col_tasa=[['TASA DE GANANCIA'],[a],[b],[len(listaNodosPuros2)],[c]]
     return None
 
 def clear_data():
