@@ -58,7 +58,7 @@ p_train.pack()
 s = ttk.Style()
 s.theme_create( "MyStyle", parent="alt", settings={
         "TNotebook": {"configure": {"tabmargins": [0, 10, 2, 0]} },
-        "TNotebook.Tab": {"configure": {"padding": [130, 10],"background": "#eadca6",
+        "TNotebook.Tab": {"configure": {"padding": [100, 10],"background": "#eadca6",
                                         "font" : ('IBM Plex Sans','13','bold') },
                               "map": {"background": [("selected", "#c36a3d"), 
                                                       ("active", "#e2c275")],
