@@ -1,8 +1,8 @@
-from tkinter import  filedialog,messagebox, ttk, GROOVE
+from tkinter import  Label, filedialog,messagebox, ttk, GROOVE
 from tkinter import Entry,StringVar
 from tkinter import font, Canvas, Tk, LabelFrame, Button, Scrollbar, Toplevel,  messagebox 
 from tkinter import TOP, BOTH, BOTTOM, RIGHT,LEFT, VERTICAL, HORIZONTAL, Y, X, END
-from tkinter.font import BOLD
+from tkinter.font import BOLD, Font
 from networkx.generators.directed import random_k_out_graph
 from pandas.core import frame
 from pandas import read_csv
@@ -16,7 +16,7 @@ from networkx.drawing.nx_pydot import write_dot, graphviz_layout
 from networkx.utils.decorators import *
 from networkx.classes.digraph import DiGraph
 from PIL import ImageTk, Image
-
+from numpy import unique
 
 #Chequear si posta las usamos 
 #import matplotlib.pyplot as plt
@@ -37,7 +37,7 @@ root.geometry(posicion)
 root.resizable(width=False , height=False)
 #root.iconbitmap('pine-tree.ico')
 
-global a , b , c, col_gan, total_rows, total_columns, t, lst, col_tasa #probar si se puede eliminar
+global a , b , c, col_gan, total_rows, total_columns, t, lst, col_tasa, ac_tasa,ac_gan #probar si se puede eliminar
 frame_e= LabelFrame(root, text="Digite Treshold")
 frame_e.place(height=55,width=180,rely=0.75,relx=0.50)
 text = StringVar()
@@ -107,6 +107,10 @@ class ValorVacio(Error):
 class threshold(Error):
     pass
 class train(Error):
+    pass
+class valorErroneo(Error):
+    pass
+class stringVacio(Error):
     pass
 
 #funciones PANTALLA 1
@@ -181,14 +185,16 @@ def Ejecutar(): #ejecuta el algortmo
     train_set = shuffle_df[:train_size]
     test_set = shuffle_df[train_size:]
 
-    arbol(train_set) #CREA ARBOL TASA Y GANANCIA 
+    arbol(train_set,test_set) #CREA ARBOL TASA Y GANANCIA 
 
     # Tomamos la datac
     lst = [('',col_gan[0], 'TASA DE GANANCIA'),
     ("Cantidad de caminos",col_gan[1],col_tasa[1]),
     ('Profundidad Maxima',col_gan[2],col_tasa[2]),
     ('Nodos Hojas Puros',col_gan[3],col_tasa[3]),
-    ("Nodos de Decision",col_gan[4],col_tasa[4])]
+    ("Nodos de Decision",col_gan[4],col_tasa[4]),
+    ("Accuracy",col_gan[5],col_tasa[5])
+    ]
 
     # Encontrar el total de filas y columnas de la lista para la tabla
     total_rows = len(lst)
@@ -197,16 +203,40 @@ def Ejecutar(): #ejecuta el algortmo
     armarTabla(lst,total_rows, total_columns,tab3)#tabla ventana 3
     
 
-    lst = [('','GANANCIA', 'TASA DE GANANCIA'),
-    ("Presicion",'presicion de ganancia','presicion de tasa')]
-    total_rows = len(lst)
-    total_columns = len(lst[0])
-    armarTabla(lst,total_rows, total_columns,tab4)#tabla ventana 4
-
     #VER COMO SE HARIA LA TABLA DE MATRIZ DE CONFUSION 
 
-    #armarTabla(lst,total_rows, total_columns,tab5)#tabla ventana 5
+    #armarTabla(lst,total_rows, total_columns,tab5)#tabla ventana 4
 
+    #pestaña 5
+    x=df.columns
+    x=x[:-1]
+    x=control_id(df,x)
+    lista=''
+
+    for i in x: 
+        lista=lista+i+":"
+        valores= unique(df[i])
+        #print("valres de cada column",valores)
+        for z in valores: 
+            z=str(z)
+            lista=lista+z+','
+        lista=lista+";"
+    
+    reg.config(text=lista)
+    button5= Button(reg,text="Clasificar",  width=9,height=3, command=lambda: clasificacion(df) )  
+    button5.place(rely=0.0010,relx=0.8) 
+
+    #tabla 
+    label_tabla=LabelFrame(tab5)
+    label_tabla.place(rely=0.3, relx=0.2)
+    comparacion=[('','GANANCIA', 'TASA DE GANANCIA'),
+    ("Clasificacion",'','')
+    ] 
+    total_rows = len(comparacion)
+    total_columns = len(comparacion[0])
+
+    armarTabla(comparacion,total_rows, total_columns,label_tabla)#tabla ventana 5
+    
 
     #cambiar de ventana 1->2
     root.state(newstate = "withdraw")
@@ -214,8 +244,8 @@ def Ejecutar(): #ejecuta el algortmo
 
     return None
 
-def arbol(df):
-    global d, e, f, col_gan
+def arbol(df,test):
+    global d, e, f, col_gan, ac_gan
     col_gan=[]
 
     #Definimos los parametros para funciones 
@@ -246,13 +276,13 @@ def arbol(df):
 
     lienzo.create_image(0, 0, anchor="nw", image=img, tag="img")
 
-    d,e,f=cuadroComp(TG)
+    d,e,f,ac_gan=cuadroComp(TG,test)
     
     #col_gan=[['GANANCIA'],[d],[e],[f],[len(listaNodosDec)]]
-    col_gan=[['GANANCIA'],[d],[e],[len(listaNodosPuros)],[f]]
+    col_gan=[['GANANCIA'],[d],[e],[len(listaNodosPuros)],[f],[ac_gan]]
 
     #COMIENZA ARBOL TASA Y LIENZO 2
-    global a, b, c, col_tasa
+    global a, b, c, col_tasa,ac_tasa
     col_tasa=[]
 
     listaAtr2 = df.columns
@@ -276,9 +306,9 @@ def arbol(df):
     lienzo2.config(scrollregion=(0, 0, ancho, largo))
     img2= ImageTk.PhotoImage(img2)
     lienzo2.create_image(0, 0, anchor="nw", image=img2, tag="img2")
-    a,b,c=cuadroComp(TT)
+    a,b,c,ac_tasa=cuadroComp(TT,test)
     #col_tasa=[['TASA DE GANANCIA'],[a],[b],[c],[len(listaNodosDec2)]]
-    col_tasa=[['TASA DE GANANCIA'],[a],[b],[len(listaNodosPuros2)],[c]]
+    col_tasa=[['TASA DE GANANCIA'],[a],[b],[len(listaNodosPuros2)],[c],[ac_tasa]]
     return None
 
 def clear_data():
@@ -289,6 +319,9 @@ def volver_p1(): #funcion del boton volver de la pantalla 2
     root.deiconify()
     lienzo.delete("all") #agregue
     lienzo2.delete("img2") #agregue   
+
+
+
 #-------------------- PANTALLA 2 ----------------------------
 window = Toplevel() #para otras pantallas toplevel, para el main root
 window.state('withdraw') #hace que arranque fullscreen
@@ -311,11 +344,11 @@ tab_control.add(tab3, text='Comparacion')
 tab_control.pack(expand=1, fill='both') 
 #PESTAÑA 4
 tab4 = ttk.Frame(tab_control)
-tab_control.add(tab4, text='Presicion')
+tab_control.add(tab4, text='Matriz de confusion')
 tab_control.pack(expand=1, fill='both') 
 #PESTAÑA 5
 tab5 = ttk.Frame(tab_control)
-tab_control.add(tab5, text='Matriz de confusion')
+tab_control.add(tab5, text='Clasificacion')
 tab_control.pack(expand=1, fill='both') 
 
 #Lienzo tab1
@@ -359,6 +392,13 @@ lienzo2.config(yscrollcommand=sbarV2.set)
 lienzo2.config(xscrollcommand=sbarH2.set)
 lienzo2.pack(side=TOP, expand=True, fill=BOTH) #opcion nueva fede (expand=True, fill="both", side="top")
 #Funcion que permite guardar en el diccionario anterior los datos de un objeto sobre el que presionamos con el raton
+fontStyle= Font(family="Lucida Grande", size=15)
+reg = LabelFrame(tab5, font=fontStyle)  #encontraste el stringify o lr busco yo te decia pa hacer una funcion sino q separe por ;
+reg.place(height=130, width=2000) # no pero tengo una idea yo decia recorrer de.colums y ir anotando tmb los valores de cada columa 
+nuevo = Entry(reg,font=fontStyle)
+nuevo.place(width="1570", height="50")
+
+
 def imgPress2(event):
     posicion["item"] = lienzo2.find_closest(event.x, event.y)[0]
     posicion["x"] = event.x
@@ -386,7 +426,13 @@ volver.place(relx=50, rely=50, height= 50)
 volver.pack(pady=30)
 buttonE= Button(volver, text="Volver", width=10,height=2, command=lambda:volver_p1())
 buttonE.pack()
-#clase tabla comparativo 
+
+
+
+
+
+
+#funcion tabla comparativo 
 def armarTabla(lst,total_rows,total_columns,frame):
     for i in range(total_rows): #Rows
         for j in range(total_columns): #Columns
@@ -402,6 +448,46 @@ def armarTabla(lst,total_rows,total_columns,frame):
 def on_closing():
     if messagebox.askokcancel("CERRAR", "¿Seguro que quiere salir?"):
         root.destroy()
+
+def clasificacion(df):
+    x= nuevo.get()
+    print("aca entro a la funcion ", x)
+    try:
+        # y=x.split(',',';')
+        # print(y)
+        cont=0 
+        valor_e=x.split(',')
+        print(valor_e)
+        columnas=df.columns
+        columnas=control_id(df,columnas)
+        columnas=columnas[:-1]
+        print(len(columnas))
+        print(len(valor_e))
+        if len(valor_e) == 0:
+            raise stringVacio
+        if len(columnas)==(len(valor_e)):
+            lista_entry=[]
+            for i in valor_e:
+                valores_r= unique(df[columnas[cont]])
+                bien=False
+                for z in valores_r:
+                    if z==i:
+                        bien=True
+                        lista_entry.append(valor_e)
+                        cont=cont+1 
+                if bien==False:
+                    raise valorErroneo
+        else:
+           raise valorErroneo 
+                
+        print(lista_entry)
+
+    except valorErroneo:
+        messagebox.showerror("Advertencia","Respete los formatos de los valores")
+        return None
+    except stringVacio:
+        messagebox.showerror("Error", "No se ingreso nada")
+        return None
  
 window.protocol("WM_DELETE_WINDOW", on_closing)
 root.protocol("WM_DELETE_WINDOW", on_closing)

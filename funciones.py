@@ -21,7 +21,7 @@ def entropia_atr(df, atributo,clase ): #entradas --> todo el conjunto,nombre atr
     suma = 0 
     cont=0
     for i in (valores[0]):
-        reg = groups.oup(i) #agrupa el dataframe segun el valor 
+        reg = groups.get_group(i) #agrupa el dataframe segun el valor 
         probabilidad = valores[1][cont] / len(df) 
         cont += 1
         result = entropia(reg, clase) 
@@ -54,12 +54,12 @@ def cuadroComp(T, df):
         array = []
         for i in range(len(path)):
             if i < len(path)-1:
-                x = TG.nodes[path[i]]['label']
-                y = TG.edges[path[i], path[i+1]]['label']
+                x = T.nodes[path[i]]['label']
+                y = T.edges[path[i], path[i+1]]['label']
                 array.append([x,y])
                 #print('nodo', x, 'edge', y)
             else:
-                x = TG.nodes[path[i]]['label']
+                x = T.nodes[path[i]]['label']
                 array.append([x])
         caminos.append(array)
     for i in caminos:#Tratamiento de array de la prediccion
@@ -84,6 +84,8 @@ def cuadroComp(T, df):
                     df_aux = [] #si en alguna particion no hay los valores del camino, ninguno va a pasar por ese camino
         if len(df_aux) != 0: #cantidad de filas = len(df_aux) | si es 0 ni una instancia de test llego a ese camino
             etiquetas = df_aux[clase].tolist() #etiquetas de las instancias de test
+            y_true=[]
+            y_pred=[]
             for i in etiquetas:
                 y_true.append(i)
                 y_pred.append(valorClase)
