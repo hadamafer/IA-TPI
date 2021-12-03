@@ -20,7 +20,7 @@ def entropia_atr(df, atributo,clase ): #entradas --> todo el conjunto,nombre atr
     suma = 0 
     cont=0
     for i in (valores[0]):
-        reg = groups.get_group(i) #agrupa el dataframe segun el valor 
+        reg = groups.oup(i) #agrupa el dataframe segun el valor 
         probabilidad = valores[1][cont] / len(df) 
         cont += 1
         result = entropia(reg, clase) 
@@ -28,7 +28,7 @@ def entropia_atr(df, atributo,clase ): #entradas --> todo el conjunto,nombre atr
 
     return suma
 
-def cuadroComp(T):
+def cuadroComp(T, df_test):
     
     roots = (v for v, d in T.in_degree() if d == 0)
     leaves = (v for v, d in T.out_degree() if d == 0)
@@ -47,8 +47,56 @@ def cuadroComp(T):
     count = unique(count)
     count= len(count)
     paths = len(all_paths)
+    #armar los caminos como pares atributo,valor
+    caminos = []
+    for path in all_paths:
+        array = []
+        for i in range(len(path)):
+            if i < len(path)-1:
+                x = TG.nodes[path[i]]['label']
+                y = TG.edges[path[i], path[i+1]]['label']
+                array.append([x,y])
+                #print('nodo', x, 'edge', y)
+            else:
+                x = TG.nodes[path[i]]['label']
+                array.append([x])
+        caminos.append(array)
+    for i in caminos:#Tratamiento de array de la prediccion
+        pos=i[-1][0].split('\n')
+        if len(pos) > 1:
+            pos.pop(-1)
+        i[-1]=pos[0]   
+    df_aux = df
+    listaAtr = df_aux.columns
+    clase = listaAtr[-1]
+    #busqueda --> por cada camino, si llegan instancias, registra la clasificacion
+    for camino in caminos:
+        valorClase = camino[-1]#clase predicta
+        camino = camino [:-1] #saca el ultimo elemento  
+        for i in camino:#cada par atributo valor
+            if len(df_aux) > 0:
+                valoresAtr = df_aux[i[0]].tolist()
+                if i[1] in valoresAtr:
+                    df_aux = df_aux.groupby(i[0])
+                    df_aux = df_aux.get_group(i[1]) #obtener el grupo de los q tengan ese valor     
+                else:
+                    df_aux = [] #si en alguna particion no hay los valores del camino, ninguno va a pasar por ese camino
+        if len(df_aux) != 0: #cantidad de filas = len(df_aux) | si es 0 ni una instancia de test llego a ese camino
+            etiquetas = df_aux[clase].tolist() #etiquetas de las instancias de test
+            for i in etiquetas:
+                y_true.append(i)
+                y_pred.append(valorClase)
+        df_aux = df
+    #calculo accuracy
+    clasificacionesCorrectas = 0
+    for i in range(len(y_true)):
+        if y_true[i] == y_pred[i]:
+            clasificacionesCorrectas += 1
+    instanciasTest = len(df)
+    accuracy = clasificacionesCorrectas / instanciasTest
 
-    return paths, profundidad,count
+
+    return paths, profundidad,count, accuracy
 
 def control_id(df,listaAtr):  
     if ((len(unique(df.iloc[:,0]))) == len(df.iloc[:,0])):
