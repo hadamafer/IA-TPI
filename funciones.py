@@ -5,7 +5,7 @@ from networkx.classes.digraph import DiGraph
 from networkx import shortest_path_length, all_simple_paths
 from networkx.algorithms.traversal.depth_first_search import dfs_tree
 from pandas.core.frame import DataFrame
-from networkx import nodes, edges
+
 
 def entropia(dataFrame, clase):
     counts = unique(dataFrame[clase], return_counts=True) #se almacena que valores toma y cuantas ocurrencias de cada valor
