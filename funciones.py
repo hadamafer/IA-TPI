@@ -59,7 +59,7 @@ def cuadroComp(T, df):
                 array.append([x,y])
                 #print('nodo', x, 'edge', y)
             else:
-                x = TG.nodes[path[i]]['label']
+                x = T.nodes[path[i]]['label']
                 array.append([x])
         caminos.append(array)
     for i in caminos:#Tratamiento de array de la prediccion
