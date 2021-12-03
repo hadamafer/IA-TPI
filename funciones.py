@@ -28,7 +28,7 @@ def entropia_atr(df, atributo,clase ): #entradas --> todo el conjunto,nombre atr
 
     return suma
 
-def cuadroComp(T, df_test):
+def cuadroComp(T, df):
     
     roots = (v for v, d in T.in_degree() if d == 0)
     leaves = (v for v, d in T.out_degree() if d == 0)
