@@ -71,6 +71,8 @@ def cuadroComp(T, df):
     listaAtr = df_aux.columns
     clase = listaAtr[-1]
     #busqueda --> por cada camino, si llegan instancias, registra la clasificacion
+    y_true = []
+    y_pred = []
     for camino in caminos:
         valorClase = camino[-1]#clase predicta
         camino = camino [:-1] #saca el ultimo elemento  
@@ -84,8 +86,6 @@ def cuadroComp(T, df):
                     df_aux = [] #si en alguna particion no hay los valores del camino, ninguno va a pasar por ese camino
         if len(df_aux) != 0: #cantidad de filas = len(df_aux) | si es 0 ni una instancia de test llego a ese camino
             etiquetas = df_aux[clase].tolist() #etiquetas de las instancias de test
-            y_true = []
-            y_pred = []
             for i in etiquetas:
                 y_true.append(i)
                 y_pred.append(valorClase)
