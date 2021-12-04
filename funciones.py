@@ -113,11 +113,12 @@ def cuadroComp(T, df):
     accuracy = clasificacionesCorrectas / instanciasTest
     return paths, profundidad,count, accuracy
 
-def nuevaInstancia(T, entry, columnas):
+def nuevaInstancia(T, entry, df):
     paths, all_paths = busqueda((T))
     caminos = armarCaminos(T, all_paths)
     clasif = 'yes'
     return clasif
+
 
 
 def control_id(df,listaAtr):  
