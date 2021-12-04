@@ -203,9 +203,7 @@ def Ejecutar(): #ejecuta el algortmo
     armarTabla(lst,total_rows, total_columns,tab3)#tabla ventana 3
     
 
-    #VER COMO SE HARIA LA TABLA DE MATRIZ DE CONFUSION 
 
-    #armarTabla(lst,total_rows, total_columns,tab5)#tabla ventana 4
 
     #pestaña 5
     x=df.columns
@@ -342,10 +340,7 @@ tab_control.add(tab2, text='Tasa de Ganancia')
 tab3 = ttk.Frame(tab_control)
 tab_control.add(tab3, text='Comparacion')
 tab_control.pack(expand=1, fill='both') 
-#PESTAÑA 4
-tab4 = ttk.Frame(tab_control)
-tab_control.add(tab4, text='Matriz de confusion')
-tab_control.pack(expand=1, fill='both') 
+
 #PESTAÑA 5
 tab5 = ttk.Frame(tab_control)
 tab_control.add(tab5, text='Clasificacion')
