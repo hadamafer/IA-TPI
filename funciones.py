@@ -39,7 +39,6 @@ def armarCaminos(T, all_paths):
                 x = T.nodes[path[i]]['label']
                 y = T.edges[path[i], path[i+1]]['label']
                 array.append([x,y])
-                #print('nodo', x, 'edge', y)
             else:
                 x = T.nodes[path[i]]['label']
                 array.append([x])
@@ -76,7 +75,6 @@ def cuadroComp(T, df):
     df_aux = df
     listaAtr = df_aux.columns
     clase = listaAtr[-1]
-    print("caminos", caminos)
     #busqueda --> por cada camino, si llegan instancias, registra la clasificacion
     y_true = []
     y_pred = []
@@ -89,20 +87,13 @@ def cuadroComp(T, df):
                 if i[1] in valoresAtr:
                     df_aux = df_aux.groupby(i[0])
                     df_aux = df_aux.get_group(i[1]) #obtener el grupo de los q tengan ese valor 
-                    print("PARTICION ", df_aux)
-                    print("para camino", camino)    
                 else:
                     df_aux = [] #si en alguna particion no hay los valores del camino, ninguno va a pasar por ese camino
         if len(df_aux) > 0: #cantidad de filas = len(df_aux) | si es 0 ni una instancia de test llego a ese camino
             etiquetas = df_aux[clase].tolist() #etiquetas de las instancias de test
-            print("ETIQUETAS", etiquetas)
-            
             for i in etiquetas:
-                print("entra al for")
                 y_true.append(i)
-                print("true", y_true)
                 y_pred.append(valorClase)
-                print("pred", y_pred)
         df_aux = df
     #calculo accuracy
     clasificacionesCorrectas = 0
@@ -117,10 +108,22 @@ def cuadroComp(T, df):
         accuracy=round(accuracy,3)
     return paths, profundidad,count, accuracy
 
-def nuevaInstancia(T, entry, df):
+def nuevaInstancia(T, entry, columnas):
     paths, all_paths = busqueda((T))
     caminos = armarCaminos(T, all_paths)
-    clasif = 'yes'
+    clasif = []
+    for camino in caminos:
+        band = True 
+        clase = camino[-1]
+        camino = camino[:-1]
+        for i in camino:
+            indice = list(columnas).index(i[0])
+            if entry[indice] != i[1]:
+                band = False
+        if band == True:
+            clasif = clase
+    if clasif == []:
+        clasif = "No se encontro camino en el arbol"
     return clasif
 
 
@@ -128,4 +131,4 @@ def nuevaInstancia(T, entry, df):
 def control_id(df,listaAtr):  
     if ((len(unique(df.iloc[:,0]))) == len(df.iloc[:,0])):
         listaAtr = delete(listaAtr,0)
-    return(listaAtr) 
+    return(listaAtr)
