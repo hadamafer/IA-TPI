@@ -111,6 +111,7 @@ def cuadroComp(T, df):
             clasificacionesCorrectas += 1
     instanciasTest = len(df)
     accuracy = clasificacionesCorrectas / instanciasTest
+    accuracy=round(accuracy,3)
     return paths, profundidad,count, accuracy
 
 def nuevaInstancia(T, entry, df):

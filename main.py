@@ -290,8 +290,6 @@ def arbol(df,test):
             lista=lista+z+','
         lista=lista+"} | "
     
-    y=Label(reg,text='Formato requerido: atributo1,atributo2,..,atributon', font=fontStyle)
-    y.pack(side=BOTTOM)
     
     reg.config(text=lista)
     button5= Button(reg,text="Clasificar",  width=9,height=3, command=lambda: clasificacion(df,TG,TT) )  
@@ -380,7 +378,7 @@ lienzo2.config(yscrollcommand=sbarV2.set)
 lienzo2.config(xscrollcommand=sbarH2.set)
 lienzo2.pack(side=TOP, expand=True, fill=BOTH) #opcion nueva fede (expand=True, fill="both", side="top")
 #Funcion que permite guardar en el diccionario anterior los datos de un objeto sobre el que presionamos con el raton
-fontStyle= Font(family="Lucida Grande", size=15)
+fontStyle= Font(family="Lucida Grande", size=10)
 reg = LabelFrame(tab5, font=fontStyle)  #encontraste el stringify o lr busco yo te decia pa hacer una funcion sino q separe por ;
 reg.place(height=130, width=2000) # no pero tengo una idea yo decia recorrer de.colums y ir anotando tmb los valores de cada columa 
 nuevo = Entry(reg,font=fontStyle)
@@ -388,6 +386,9 @@ nuevo.place(width="1300", height="50")
 
 label_tabla=LabelFrame(tab5)
 label_tabla.place(rely=0.3, relx=0.2)
+
+y=Label(reg,text='Formato requerido: atributo1,atributo2,..,atributon', font=fontStyle)
+y.pack(side=BOTTOM)
 
 def imgPress2(event):
     posicion["item"] = lienzo2.find_closest(event.x, event.y)[0]
@@ -486,6 +487,7 @@ def clasificacion(df,TG,TT):
     total_columns = len(comparacion[0])
 
     armarTabla(comparacion,total_rows, total_columns,label_tabla)#tabla ventana 5
+    nuevo.delete(0,'end')
  
 window.protocol("WM_DELETE_WINDOW", on_closing)
 root.protocol("WM_DELETE_WINDOW", on_closing)
