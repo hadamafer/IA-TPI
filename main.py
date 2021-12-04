@@ -222,7 +222,7 @@ def Ejecutar(): #ejecuta el algortmo
     
     reg.config(text=lista)
     button5= Button(reg,text="Clasificar",  width=9,height=3, command=lambda: clasificacion(df) )  
-    button5.place(rely=0.0010,relx=0.8) 
+    button5.place(rely=0.0010,relx=0.68) 
 
     #tabla 
     label_tabla=LabelFrame(tab5)
@@ -391,7 +391,7 @@ fontStyle= Font(family="Lucida Grande", size=15)
 reg = LabelFrame(tab5, font=fontStyle)  #encontraste el stringify o lr busco yo te decia pa hacer una funcion sino q separe por ;
 reg.place(height=130, width=2000) # no pero tengo una idea yo decia recorrer de.colums y ir anotando tmb los valores de cada columa 
 nuevo = Entry(reg,font=fontStyle)
-nuevo.place(width="1570", height="50")
+nuevo.place(width="1300", height="50")
 
 
 def imgPress2(event):
