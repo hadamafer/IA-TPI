@@ -110,8 +110,11 @@ def cuadroComp(T, df):
         if y_true[i] == y_pred[i]:
             clasificacionesCorrectas += 1
     instanciasTest = len(df)
-    accuracy = clasificacionesCorrectas / instanciasTest
-    accuracy=round(accuracy,3)
+    if instanciasTest==0:
+        accuracy=0
+    else:
+        accuracy = clasificacionesCorrectas / instanciasTest
+        accuracy=round(accuracy,3)
     return paths, profundidad,count, accuracy
 
 def nuevaInstancia(T, entry, df):

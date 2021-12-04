@@ -3,9 +3,17 @@ strict digraph  {
 2 [label=Trigliceridos, shape=box];
 3 [color=green, label=SI, shape=oval];
 4 [color=green, label=NO, shape=oval];
-5 [color=green, label=SI, shape=oval];
+5 [label=Edad, shape=box];
+6 [color=green, label=SI, shape=oval];
+7 [color=green, label=SI, shape=oval];
+8 [color=green, label=SI, shape=oval];
+9 [color=green, label=NO, shape=oval];
 1 -> 2  [label=NO];
 1 -> 5  [label=SI];
 2 -> 3  [label=elevado];
 2 -> 4  [label="normal "];
+5 -> 6  [label="entre 40-60"];
+5 -> 7  [label="mayor a 60"];
+5 -> 8  [label="mayor a 60 "];
+5 -> 9  [label="menor 40"];
 }

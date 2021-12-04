@@ -112,7 +112,8 @@ class valorErroneo(Error):
     pass
 class stringVacio(Error):
     pass
-
+class valorUno(Error):
+    pass
 #funciones PANTALLA 1
 def Busqueda(): #solicita el archivo y lo carga
     filename=filedialog.askopenfilename(title="Seleccionar archivo",filetype=(("CSV files","*.csv"),("All Files","*.*")))
@@ -148,10 +149,17 @@ def Busqueda(): #solicita el archivo y lo carga
 def Ejecutar(): #ejecuta el algortmo 
     global col_gan, total_rows, total_columns, t, lst, col_tasa 
     file_path=label_file["text"]
+    try: 
+        p2=float(p_train.get())
+        if p2==1:
+            answer=messagebox.askyesno(title='Confirmar',message='No ingreso nada para testeo \n¿Seguro que desea continuar?')
+            if answer==False:
+                raise valorUno
+    except valorUno:
+        return None
     try:
         csv_filename=r"{}".format(file_path)
-        df = read_csv(csv_filename,sep='[;,,]', engine= 'python')
-    
+        df = read_csv(csv_filename,sep='[;,,]', engine= 'python') 
     except FileNotFoundError:
         messagebox.showerror("Error","No hay archivo seleccionado")
         return None
@@ -240,6 +248,7 @@ def arbol(df,test):
     img= ImageTk.PhotoImage(img)
 
     lienzo.create_image(0, 0, anchor="nw", image=img, tag="img")
+
 
     d,e,f,ac_gan=cuadroComp(TG,test)
     
@@ -442,7 +451,6 @@ def on_closing():
 
 def clasificacion(df,TG,TT):
     x= nuevo.get()
-    print("aca entro a la funcion ", x)
     try:
         # y=x.split(',',';')
         # print(y)
@@ -451,8 +459,7 @@ def clasificacion(df,TG,TT):
         columnas=df.columns
         columnas=control_id(df,columnas)
         columnas=columnas[:-1]
-        print(len(columnas))
-        print(len(valor_e))
+    
         if len(valor_e) == 0:
             raise stringVacio
         if len(columnas)==(len(valor_e)):
