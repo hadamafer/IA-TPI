@@ -6,7 +6,7 @@ from tkinter.font import BOLD, Font
 from networkx.generators.directed import random_k_out_graph
 from pandas.core import frame
 from pandas import read_csv
-from funciones import cuadroComp, control_id
+from funciones import cuadroComp, control_id, nuevaInstancia
 import implementacion_ganancia as ig
 import implementacion_tasa as it
 from graphviz import render
@@ -203,43 +203,6 @@ def Ejecutar(): #ejecuta el algortmo
     armarTabla(lst,total_rows, total_columns,tab3)#tabla ventana 3
     
 
-
-
-    #pestaña 5
-    x=df.columns
-    x=x[:-1]
-    x=control_id(df,x)
-    lista=''
-
-    for i in x: 
-        lista=lista+i+":{"
-        valores= unique(df[i])
-        #print("valres de cada column",valores)
-        for z in valores: 
-            z=str(z)
-            lista=lista+z+','
-        lista=lista+"} | "
-    
-    y=Label(reg,text='Formato requerido: atributo1,atributo2,..,atributon', font=fontStyle)
-    y.pack(side=BOTTOM)
-    
-    reg.config(text=lista)
-    button5= Button(reg,text="Clasificar",  width=9,height=3, command=lambda: clasificacion(df) )  
-    button5.place(rely=0.0010,relx=0.68) 
-    nuevo.place(rely=0.0010)
-
-    #tabla 
-    label_tabla=LabelFrame(tab5)
-    label_tabla.place(rely=0.3, relx=0.2)
-    comparacion=[('','GANANCIA', 'TASA DE GANANCIA'),
-    ("Clasificacion",'','')
-    ] 
-    total_rows = len(comparacion)
-    total_columns = len(comparacion[0])
-
-    armarTabla(comparacion,total_rows, total_columns,label_tabla)#tabla ventana 5
-    
-
     #cambiar de ventana 1->2
     root.state(newstate = "withdraw")
     window.state(newstate = "zoomed")
@@ -311,6 +274,32 @@ def arbol(df,test):
     a,b,c,ac_tasa=cuadroComp(TT,test)
     #col_tasa=[['TASA DE GANANCIA'],[a],[b],[c],[len(listaNodosDec2)]]
     col_tasa=[['TASA DE GANANCIA'],[a],[b],[len(listaNodosPuros2)],[c],[ac_tasa]]
+
+    #pestaña 5
+    x=df.columns
+    x=x[:-1]
+    x=control_id(df,x)
+    lista=''
+
+    for i in x: 
+        lista=lista+i+":{"
+        valores= unique(df[i])
+        #print("valres de cada column",valores)
+        for z in valores: 
+            z=str(z)
+            lista=lista+z+','
+        lista=lista+"} | "
+    
+    y=Label(reg,text='Formato requerido: atributo1,atributo2,..,atributon', font=fontStyle)
+    y.pack(side=BOTTOM)
+    
+    reg.config(text=lista)
+    button5= Button(reg,text="Clasificar",  width=9,height=3, command=lambda: clasificacion(df,TG,TT) )  
+    button5.place(rely=0.0010,relx=0.68) 
+    nuevo.place(rely=0.0010)
+
+    
+
     return None
 
 def clear_data():
@@ -397,6 +386,8 @@ reg.place(height=130, width=2000) # no pero tengo una idea yo decia recorrer de.
 nuevo = Entry(reg,font=fontStyle)
 nuevo.place(width="1300", height="50")
 
+label_tabla=LabelFrame(tab5)
+label_tabla.place(rely=0.3, relx=0.2)
 
 def imgPress2(event):
     posicion["item"] = lienzo2.find_closest(event.x, event.y)[0]
@@ -448,7 +439,7 @@ def on_closing():
     if messagebox.askokcancel("CERRAR", "¿Seguro que quiere salir?"):
         root.destroy()
 
-def clasificacion(df):
+def clasificacion(df,TG,TT):
     x= nuevo.get()
     print("aca entro a la funcion ", x)
     try:
@@ -456,7 +447,6 @@ def clasificacion(df):
         # print(y)
         cont=0 
         valor_e=x.split(',')
-        print(valor_e)
         columnas=df.columns
         columnas=control_id(df,columnas)
         columnas=columnas[:-1]
@@ -479,14 +469,23 @@ def clasificacion(df):
         else:
            raise valorErroneo 
                 
-        print(lista_entry)
-
     except valorErroneo:
         messagebox.showerror("Advertencia","Respete los formatos de los valores. \nLos valores de los atributos van separados por ','. '[atributo1],[atributo2],..,[atributon]'")
         return None
     except stringVacio:
         messagebox.showerror("Error", "No se ingreso nada")
         return None
+    #tabla 
+    cla_gan=nuevaInstancia(TG,valor_e,columnas)
+    cla_tasa=nuevaInstancia(TT,valor_e,columnas)
+
+    comparacion=[('','GANANCIA', 'TASA DE GANANCIA'),
+    ("Clasificacion",cla_gan,cla_tasa)
+    ] 
+    total_rows = len(comparacion)
+    total_columns = len(comparacion[0])
+
+    armarTabla(comparacion,total_rows, total_columns,label_tabla)#tabla ventana 5
  
 window.protocol("WM_DELETE_WINDOW", on_closing)
 root.protocol("WM_DELETE_WINDOW", on_closing)
