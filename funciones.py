@@ -7,6 +7,7 @@ from networkx.algorithms.traversal.depth_first_search import dfs_tree
 from pandas.core.frame import DataFrame
 
 
+
 def entropia(dataFrame, clase):
     counts = unique(dataFrame[clase], return_counts=True) #se almacena que valores toma y cuantas ocurrencias de cada valor
     sumatoria = 0 
@@ -29,26 +30,7 @@ def entropia_atr(df, atributo,clase ): #entradas --> todo el conjunto,nombre atr
 
     return suma
 
-def cuadroComp(T, df):
-    
-    roots = (v for v, d in T.in_degree() if d == 0)
-    leaves = (v for v, d in T.out_degree() if d == 0)
-    all_paths = []
-    for root in roots:
-        for leaf in leaves:
-            paths = all_simple_paths(T, root, leaf)
-            all_paths.extend(paths)
-    profundidad =shortest_path_length(T,1)
-    profundidad = max(profundidad.values()) +1
-    count = []
-    for nodo in all_paths:
-        nodo = nodo [:-1]
-        for n in nodo:
-            count.append(n)
-    count = unique(count)
-    count= len(count)
-    paths = len(all_paths)
-    #armar los caminos como pares atributo,valor
+def armarCaminos(T, all_paths):
     caminos = []
     for path in all_paths:
         array = []
@@ -67,10 +49,37 @@ def cuadroComp(T, df):
         if len(pos) > 1:
             pos.pop(-1)
         i[-1]=pos[0]   
+    return caminos
+def busqueda(T):
+    roots = (v for v, d in T.in_degree() if d == 0)
+    leaves = (v for v, d in T.out_degree() if d == 0)
+    all_paths = []
+    for root in roots:
+        for leaf in leaves:
+            paths = all_simple_paths(T, root, leaf)
+            all_paths.extend(paths)
+    return paths, all_paths
+def cuadroComp(T, df):
+    paths, all_paths = busqueda((T))
+    profundidad =shortest_path_length(T,1)
+    profundidad = max(profundidad.values()) +1
+    count = []
+    for nodo in all_paths:
+        nodo = nodo [:-1]
+        for n in nodo:
+            count.append(n)
+    count = unique(count)
+    count= len(count)
+    paths = len(all_paths)
+    #armar los caminos como pares atributo,valor
+    caminos = armarCaminos(T, all_paths)
     df_aux = df
     listaAtr = df_aux.columns
     clase = listaAtr[-1]
+    print("caminos", caminos)
     #busqueda --> por cada camino, si llegan instancias, registra la clasificacion
+    y_true = []
+    y_pred = []
     for camino in caminos:
         valorClase = camino[-1]#clase predicta
         camino = camino [:-1] #saca el ultimo elemento  
@@ -79,16 +88,21 @@ def cuadroComp(T, df):
                 valoresAtr = df_aux[i[0]].tolist()
                 if i[1] in valoresAtr:
                     df_aux = df_aux.groupby(i[0])
-                    df_aux = df_aux.get_group(i[1]) #obtener el grupo de los q tengan ese valor     
+                    df_aux = df_aux.get_group(i[1]) #obtener el grupo de los q tengan ese valor 
+                    print("PARTICION ", df_aux)
+                    print("para camino", camino)    
                 else:
                     df_aux = [] #si en alguna particion no hay los valores del camino, ninguno va a pasar por ese camino
-        if len(df_aux) != 0: #cantidad de filas = len(df_aux) | si es 0 ni una instancia de test llego a ese camino
+        if len(df_aux) > 0: #cantidad de filas = len(df_aux) | si es 0 ni una instancia de test llego a ese camino
             etiquetas = df_aux[clase].tolist() #etiquetas de las instancias de test
-            y_true=[]
-            y_pred=[]
+            print("ETIQUETAS", etiquetas)
+            
             for i in etiquetas:
+                print("entra al for")
                 y_true.append(i)
+                print("true", y_true)
                 y_pred.append(valorClase)
+                print("pred", y_pred)
         df_aux = df
     #calculo accuracy
     clasificacionesCorrectas = 0
@@ -97,10 +111,14 @@ def cuadroComp(T, df):
             clasificacionesCorrectas += 1
     instanciasTest = len(df)
     accuracy = clasificacionesCorrectas / instanciasTest
-    accuracy=round(accuracy,3)
-
-
     return paths, profundidad,count, accuracy
+
+def nuevaInstancia(T, entry, columnas):
+    paths, all_paths = busqueda((T))
+    caminos = armarCaminos(T, all_paths)
+    clasif = 'yes'
+    return clasif
+
 
 def control_id(df,listaAtr):  
     if ((len(unique(df.iloc[:,0]))) == len(df.iloc[:,0])):
