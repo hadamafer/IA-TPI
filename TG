@@ -1,11 +1,11 @@
 strict digraph  {
 1 [label=Hipertenso, shape=box];
-2 [label=Trigliceridos, shape=box];
-3 [color=green, label=SI, shape=oval];
-4 [color=green, label=NO, shape=oval];
+2 [label=Colesterol, shape=box];
+3 [color=green, label=NO, shape=oval];
+4 [color=green, label=SI, shape=oval];
 5 [color=green, label=SI, shape=oval];
 1 -> 2  [label=NO];
 1 -> 5  [label=SI];
-2 -> 3  [label=elevado];
-2 -> 4  [label="normal "];
+2 -> 3  [label=Bajo];
+2 -> 4  [label=Medio];
 }

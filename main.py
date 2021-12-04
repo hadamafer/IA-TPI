@@ -212,17 +212,21 @@ def Ejecutar(): #ejecuta el algortmo
     lista=''
 
     for i in x: 
-        lista=lista+i+":"
+        lista=lista+i+":{"
         valores= unique(df[i])
         #print("valres de cada column",valores)
         for z in valores: 
             z=str(z)
             lista=lista+z+','
-        lista=lista+";"
+        lista=lista+"} | "
+    
+    y=Label(reg,text='Formato requerido: atributo1,atributo2,..,atributon', font=fontStyle)
+    y.pack(side=BOTTOM)
     
     reg.config(text=lista)
     button5= Button(reg,text="Clasificar",  width=9,height=3, command=lambda: clasificacion(df) )  
     button5.place(rely=0.0010,relx=0.68) 
+    nuevo.place(rely=0.0010)
 
     #tabla 
     label_tabla=LabelFrame(tab5)
@@ -478,7 +482,7 @@ def clasificacion(df):
         print(lista_entry)
 
     except valorErroneo:
-        messagebox.showerror("Advertencia","Respete los formatos de los valores")
+        messagebox.showerror("Advertencia","Respete los formatos de los valores. \nLos valores de los atributos van separados por ','. '[atributo1],[atributo2],..,[atributon]'")
         return None
     except stringVacio:
         messagebox.showerror("Error", "No se ingreso nada")
