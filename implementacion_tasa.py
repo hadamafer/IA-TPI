@@ -15,7 +15,8 @@ def c4_5_tasa(df, listaAtr,clase,listaNodosDec,thc, T, edge,  padrecont, listaNo
         listaNodosDec.append(clasesUnicas[0])
         listaNodosPuros.append(clasesUnicas[0])
         idHoja = len(listaNodosDec)
-        T.add_node(idHoja, label = clasesUnicas[0], shape = "oval", color = "green")
+        tag = str(clasesUnicas[0]) + "\n" + str(contClase[0]) + "/" + str(contClase[0])
+        T.add_node(idHoja, label = tag, shape = "oval", color = "green")
         T.add_edge(padrecont, idHoja, label = edge)
         
     elif len(listaAtr) == 0:
@@ -85,5 +86,3 @@ def c4_5_tasa(df, listaAtr,clase,listaNodosDec,thc, T, edge,  padrecont, listaNo
                 edge = i
                 padrecont = x
                 c4_5_tasa(reg,listaAtr,clase,listaNodosDec, thc,T, edge,  padrecont, listaNodosPuros) #llamada recursiva
-   
-                
