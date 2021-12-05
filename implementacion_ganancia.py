@@ -1,17 +1,14 @@
 from networkx.algorithms.traversal.depth_first_search import dfs_tree
-
 from numpy import unique, delete
 import funciones as pr
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
-
 from pandas import Grouper, read_csv
 from networkx.drawing import nx_pydot
 from networkx.drawing.nx_agraph import graphviz_layout
 from networkx.classes.digraph import DiGraph
 from pandas.core.frame import DataFrame
 
-#import controles as c
 
 def c4_5_ganancia(df, listaAtr,clase,listaNodosDec,thc, T, edge,  padrecont, listaNodosPuros):
     data = df.values
@@ -21,23 +18,20 @@ def c4_5_ganancia(df, listaAtr,clase,listaNodosDec,thc, T, edge,  padrecont, lis
         listaNodosPuros.append(clasesUnicas[0])
         listaNodosDec.append(clasesUnicas[0])  
         idHoja = len(listaNodosDec)
-        T.add_node(idHoja, label = clasesUnicas[0], shape = "oval", color = "green")
-        T.add_edge(padrecont, idHoja, label = edge)
-      
+        tag = str(clasesUnicas[0]) + "\n" + str(contClase[0]) + "/" + str(contClase[0])
+        T.add_node(idHoja, label = tag, shape = "oval", color = "green")
+        T.add_edge(padrecont, idHoja, label = edge) 
     elif len(listaAtr) == 0:
-        
         claseFrec = max(contClase)
         probabilidad = round(claseFrec / (df.shape[0]), 2)
         indice = list(contClase).index(claseFrec)
         clasificacion = clasesUnicas[indice]
         listaNodosDec.append(clasificacion)
-        tag = str(clasificacion) + '\n' + "P = " + str(probabilidad)
+        tag = str(clasificacion) + '\n' + "P = " + str(probabilidad) 
         idH = len(listaNodosDec)
         T.add_node(idH, label = tag, shape = "oval")
         T.add_edge(padrecont, idH, label = edge )
-
     else:
-
         entConjunto = pr.entropia(df,clase) #p0
         entConjunto=round(entConjunto,4)
         listaEnt = []
@@ -81,4 +75,3 @@ def c4_5_ganancia(df, listaAtr,clase,listaNodosDec,thc, T, edge,  padrecont, lis
                 edge = i
                 padrecont = x
                 c4_5_ganancia(reg,listaAtr,clase,listaNodosDec, thc,T, edge,  padrecont, listaNodosPuros) #llamada recursiva
-
