@@ -5,9 +5,6 @@ from networkx.classes.digraph import DiGraph
 from networkx import shortest_path_length, all_simple_paths
 from networkx.algorithms.traversal.depth_first_search import dfs_tree
 from pandas.core.frame import DataFrame
-
-
-
 def entropia(dataFrame, clase):
     counts = unique(dataFrame[clase], return_counts=True) #se almacena que valores toma y cuantas ocurrencias de cada valor
     sumatoria = 0 
@@ -15,7 +12,6 @@ def entropia(dataFrame, clase):
         probabilidad = counts[1][i] / len(dataFrame) 
         sumatoria = sumatoria - (probabilidad * (log(probabilidad,2))) 
     return sumatoria
-
 def entropia_atr(df, atributo,clase ): #entradas --> todo el conjunto,nombre atributo, nombre clase(sacar de columnas) 
     groups = df.groupby(atributo)
     valores = unique(df[atributo], return_counts=True) #np.unique --> pasarle el dataframe df[valor_atributo]
@@ -27,9 +23,7 @@ def entropia_atr(df, atributo,clase ): #entradas --> todo el conjunto,nombre atr
         cont += 1
         result = entropia(reg, clase) 
         suma = suma + (probabilidad * result)
-
     return suma
-
 def armarCaminos(T, all_paths):
     caminos = []
     for path in all_paths:
@@ -44,7 +38,7 @@ def armarCaminos(T, all_paths):
                 array.append([x])
         caminos.append(array)
     for i in caminos:#Tratamiento de array de la prediccion
-        pos=i[-1][0].split('\n')
+        pos=str(i[-1][0]).split('\n')
         if len(pos) > 1:
             pos.pop(-1)
         i[-1]=pos[0]   
@@ -95,7 +89,6 @@ def cuadroComp(T, df):
                 y_true.append(i)
                 y_pred.append(valorClase)
         df_aux = df
-    #calculo accuracy
     clasificacionesCorrectas = 0
     for i in range(len(y_true)):
         if y_true[i] == y_pred[i]:
@@ -107,7 +100,6 @@ def cuadroComp(T, df):
         accuracy = clasificacionesCorrectas / instanciasTest
         accuracy=round(accuracy,3)
     return paths, profundidad,count, accuracy
-
 def nuevaInstancia(T, entry, columnas):
     paths, all_paths = busqueda((T))
     caminos = armarCaminos(T, all_paths)
@@ -123,10 +115,8 @@ def nuevaInstancia(T, entry, columnas):
         if band == True:
             clasif = clase
     if clasif == []:
-        clasif = "No se encontro camino en el arbol"
+        clasif = "No se encontro camino"
     return clasif
-
-
 
 def control_id(df,listaAtr):  
     if ((len(unique(df.iloc[:,0]))) == len(df.iloc[:,0])):
